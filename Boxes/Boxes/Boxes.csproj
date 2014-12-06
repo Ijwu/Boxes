@@ -108,7 +108,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Box.cs" />
+    <Compile Include="Collision\Collision.cs" />
     <Compile Include="Collision\CollisionService.cs" />
+    <Compile Include="Entity\Chunk.cs" />
+    <Compile Include="Entity\CollisionEvent.cs" />
     <Compile Include="Entity\IEntity.cs" />
     <Compile Include="Entity\EntityManager.cs" />
     <Compile Include="Entity\IUpdate.cs" />
@@ -116,6 +119,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Boxes.cs" />
     <Compile Include="Services\AssetService.cs" />
+    <Compile Include="Services\IComponentService.cs" />
+    <Compile Include="Services\UpdateableServicesCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

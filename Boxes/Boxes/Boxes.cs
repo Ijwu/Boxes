@@ -24,14 +24,21 @@ namespace Boxes
         private AssetService _assetService;
         private EntityManager _entityManager;
         private CollisionService _collisionService;
+        public UpdateableServicesCollection UpdateableServices;
 
         public Boxes()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
             _assetService = new AssetService(this);
             _collisionService = new CollisionService(this);
+            
+            UpdateableServices = new UpdateableServicesCollection();
             this.IsMouseVisible = true;
+
+            _graphics.PreferredBackBufferHeight = 768;
+            _graphics.PreferredBackBufferWidth = 1280;
         }
 
         /// <summary>
@@ -56,7 +63,7 @@ namespace Boxes
             // Create a new SpriteBatch, which can be used to draw textures.
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _entityManager = new EntityManager(this);
-            this.Components.Add(_entityManager);
+            this.UpdateableServices.AddService(typeof(EntityManager),_entityManager);
 
             for (int i = 1; i < 5000; i++)
             {
@@ -90,7 +97,8 @@ namespace Boxes
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            // TODO: Add your update logic here
+            this.UpdateableServices.Update(gameTime);
+            _collisionService.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -102,6 +110,8 @@ namespace Boxes
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
+
+            this.UpdateableServices.Draw(gameTime);
 
             base.Draw(gameTime);
         }
