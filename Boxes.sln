@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Boxes", "Boxes\Boxes\Boxes.csproj", "{40407BBA-E9E5-422B-B984-0B6AEF0B2E28}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "BoxesContent", "Boxes\BoxesContent\BoxesContent.contentproj", "{BB2E82B9-ED8E-4D43-943C-1BD1AA25D42B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40407BBA-E9E5-422B-B984-0B6AEF0B2E28}.Debug|x86.ActiveCfg = Debug|x86
+		{40407BBA-E9E5-422B-B984-0B6AEF0B2E28}.Debug|x86.Build.0 = Debug|x86
+		{40407BBA-E9E5-422B-B984-0B6AEF0B2E28}.Release|x86.ActiveCfg = Release|x86
+		{40407BBA-E9E5-422B-B984-0B6AEF0B2E28}.Release|x86.Build.0 = Release|x86
+		{BB2E82B9-ED8E-4D43-943C-1BD1AA25D42B}.Debug|x86.ActiveCfg = Debug|x86
+		{BB2E82B9-ED8E-4D43-943C-1BD1AA25D42B}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
