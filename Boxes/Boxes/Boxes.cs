@@ -86,6 +86,15 @@ namespace Boxes
                 };
                 _entityManager.AddEntity(box);   
             }
+
+            _entityManager.AddEntity(new Wall(1280, 10, Color.LightGray, new Vector2(0, 750),
+                _assetService.LoadContent<Texture2D>("box")));
+
+            _entityManager.AddEntity(new Wall(10, 768, Color.LightGray, new Vector2(10, 0),
+                _assetService.LoadContent<Texture2D>("box")));
+
+            _entityManager.AddEntity(new Wall(10, 768, Color.LightGray, new Vector2(1260, 0),
+                _assetService.LoadContent<Texture2D>("box")));
         }
 
         /// <summary>

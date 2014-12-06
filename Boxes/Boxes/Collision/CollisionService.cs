@@ -10,7 +10,6 @@ namespace Boxes.Collision
     public class CollisionService
     {
         private Boxes _game;
-        private const int GridSpacing = 64;
 
         public CollisionService(Game game)
         {
