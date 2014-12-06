@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Boxes
 {
-    public class Box : IEntity
+    public class Box : IEntity, IDisposable
     {
         public int Width { get; set; }
 
@@ -24,8 +24,23 @@ namespace Boxes
 
         public Texture2D Texture { get; set; }
 
-        public Box()
+        public bool Disposing { get; set; }
+
+        public Box(Texture2D texture)
         {
+            Width = 10;
+            Height = 10;
+            Color = Color.White;
+            Texture = texture;
+        }
+
+        public Box(Color color, Vector2 position, Texture2D texture)
+        {
+            Width = 10;
+            Height = 10;
+            Color = color;
+            Position = position;
+            Texture = texture;
         }
 
         public Box(int width, int height, Color color, Vector2 position, Texture2D texture)
@@ -53,7 +68,14 @@ namespace Boxes
 
         public void Draw(SpriteBatch sb, GameTime time)
         {
-            sb.Draw(null, Position, Color);
+            sb.Begin();
+            sb.Draw(Texture, Position, Color);
+            sb.End();
+        }
+
+        public void Dispose()
+        {
+            Disposing = true;
         }
     }
 }
