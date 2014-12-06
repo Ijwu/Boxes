@@ -26,6 +26,8 @@ namespace Boxes
 
         public bool Disposing { get; set; }
 
+        public event CollisionEvent Collides;
+
         public Box(Texture2D texture)
         {
             Width = 10;
@@ -54,23 +56,45 @@ namespace Boxes
 
         public void Initialize()
         {
-            
+            Collides += OnCollide;
         }
 
         public void Update(GameTime gameTime)
         {
             Position += Velocity;
-            Velocity -= Friction;
             Position += Gravity;
+            Velocity -= Friction;
+        }
 
-            //TODO: Collision detection here.
+        private void OnCollide(object sender, CollisionEventArgs args)
+        {
+            if (Position.X > (args.Other.X + args.Other.Width)/2)
+            {
+                Position = new Vector2(args.Other.Right, Position.Y);
+            }
+            else
+            {
+                Position = new Vector2(args.Other.Left+args.Other.Width, Position.Y);
+            }
+
+            if (Position.Y > (args.Other.Y + args.Other.Height) / 2)
+            {
+                Position = new Vector2(Position.X, args.Other.Bottom);
+            }
+            else
+            {
+                Position = new Vector2(Position.X, args.Other.Top+args.Other.Height);
+            }
+        }
+
+        public void Push(Vector2 vel)
+        {
+            Velocity += vel;
         }
 
         public void Draw(SpriteBatch sb, GameTime time)
         {
-            sb.Begin();
-            sb.Draw(Texture, Position, Color);
-            sb.End();
+            sb.Draw(Texture, new Rectangle((int)Position.X, (int)Position.Y, Width, Height), Color);
         }
 
         public Rectangle GetBoundingBox()
