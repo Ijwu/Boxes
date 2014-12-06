@@ -27,6 +27,8 @@ namespace Boxes
 
         public bool Disposing { get; set; }
 
+        public Chunk Chunk { get; set; }
+
         public event CollisionEvent Collides;
 
         public Box(Texture2D texture)
