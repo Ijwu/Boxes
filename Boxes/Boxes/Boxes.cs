@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Boxes.Entity;
+using Boxes.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -19,11 +20,13 @@ namespace Boxes
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        private AssetService _assetService;
 
         public Boxes()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            _assetService = new AssetService(this);
         }
 
         /// <summary>
@@ -35,6 +38,7 @@ namespace Boxes
         protected override void Initialize()
         {
             this.Components.Add(new EntityManager(this));
+            this.Services.AddService(typeof(AssetService), _assetService);
         }
 
         /// <summary>

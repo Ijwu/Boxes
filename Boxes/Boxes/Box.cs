@@ -9,40 +9,32 @@ namespace Boxes
     public class Box : IEntity
     {
         public int Width { get; set; }
+
         public int Height { get; set; }
+
         public Color Color { get; set; }
+
         public Vector2 Position { get; set; }
+
         public Vector2 Velocity { get; set; }
+
         public Vector2 Friction { get; set; }
+
         public Vector2 Gravity { get; set; }
+
         public Texture2D Texture { get; set; }
 
         public Box()
         {
         }
 
-        public Box(int width, int height, Color color)
-        {
-            Width = width;
-            Height = height;
-            Color = color;
-        }
-
-        public Box(int width, int height, Color color, Vector2 position, Vector2 velocity)
+        public Box(int width, int height, Color color, Vector2 position, Texture2D texture)
         {
             Width = width;
             Height = height;
             Color = color;
             Position = position;
-            Velocity = velocity;
-        }
-
-        public Box(int width, int height, Color color, Vector2 position)
-        {
-            Width = width;
-            Height = height;
-            Color = color;
-            Position = position;
+            Texture = texture;
         }
 
         public void Initialize()
