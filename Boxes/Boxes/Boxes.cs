@@ -46,6 +46,8 @@ namespace Boxes
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            this.Content.Load<Texture2D>("Box");
+
             // TODO: use this.Content to load your game content here
         }
 
