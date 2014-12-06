@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Boxes.Collision;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Boxes.Entity

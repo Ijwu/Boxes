@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Boxes.Entity;
 using Microsoft.Xna.Framework;
 
-namespace Boxes.Entity
+namespace Boxes.Collision
 {
     public class Chunk
     {

@@ -110,8 +110,8 @@
     <Compile Include="Box.cs" />
     <Compile Include="Collision\Collision.cs" />
     <Compile Include="Collision\CollisionService.cs" />
-    <Compile Include="Entity\Chunk.cs" />
-    <Compile Include="Entity\CollisionEvent.cs" />
+    <Compile Include="Collision\Chunk.cs" />
+    <Compile Include="Collision\CollisionEvent.cs" />
     <Compile Include="Entity\IEntity.cs" />
     <Compile Include="Entity\EntityManager.cs" />
     <Compile Include="Entity\IUpdate.cs" />

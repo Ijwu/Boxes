@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Boxes.Entity
+namespace Boxes.Collision
 {
     public delegate void CollisionEvent(object sender, CollisionEventArgs args);
 

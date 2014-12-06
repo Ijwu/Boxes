@@ -11,20 +11,29 @@ namespace Boxes.Collision
     public class CollisionService
     {
         private Boxes _game;
-        private List<Chunk> _chunks; 
+        private Chunk[,] _chunks;
+        private const int GridSpacing = 64;
 
         public CollisionService(Game game)
         {
             _game = game as Boxes;
-            _chunks = new List<Chunk>();
+
+            _chunks = new Chunk[game.GraphicsDevice.Viewport.Width / GridSpacing, game.GraphicsDevice.Viewport.Height/GridSpacing];
+            for (int i = 0; i < game.GraphicsDevice.Viewport.Width; i += GridSpacing)
+            {
+                for (int j = 0; j < game.GraphicsDevice.Viewport.Height; j += GridSpacing)
+                {
+                    _chunks[i/GridSpacing, j/GridSpacing] = new Chunk(i, j, GridSpacing);
+                }
+            }
         }
 
-        public bool Collides(Rectangle box1, Rectangle box2)
+        public static bool Collides(Rectangle box1, Rectangle box2)
         {
             return box1.Intersects(box2);
         }
 
-        public List<Tuple<Rectangle, Rectangle>> CollidesList(List<Rectangle> rects)
+        public static List<Tuple<Rectangle, Rectangle>> CollidesList(List<Rectangle> rects)
         {
             return  (from x in rects
                     from y in rects
@@ -42,6 +51,11 @@ namespace Boxes.Collision
         public void Update(GameTime time)
         {
             var et = _game.UpdateableServices.GetService(typeof (EntityManager)) as EntityManager;
+            var ents = et.GetEntities();
+            foreach (var entity in ents)
+            {
+                
+            }
         }
     }
 }

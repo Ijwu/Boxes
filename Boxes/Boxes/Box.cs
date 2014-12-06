@@ -1,4 +1,5 @@
 ﻿using System;
+using Boxes.Collision;
 using Boxes.Entity;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
