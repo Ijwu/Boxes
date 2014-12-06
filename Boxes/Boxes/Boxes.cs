@@ -23,7 +23,6 @@ namespace Boxes
         private SpriteBatch _spriteBatch;
         private AssetService _assetService;
         private EntityManager _entityManager;
-        private CollisionService _collisionService;
         public UpdateableServicesCollection UpdateableServices;
 
         public Boxes()
@@ -32,7 +31,6 @@ namespace Boxes
             Content.RootDirectory = "Content";
 
             _assetService = new AssetService(this);
-            _collisionService = new CollisionService(this);
             
             UpdateableServices = new UpdateableServicesCollection();
             this.IsMouseVisible = true;
@@ -51,7 +49,6 @@ namespace Boxes
         {
             base.Initialize();
             this.Services.AddService(typeof(AssetService), _assetService);
-            this.Services.AddService(typeof (CollisionService), _collisionService);
         }
 
         /// <summary>
@@ -98,7 +95,6 @@ namespace Boxes
                 this.Exit();
 
             this.UpdateableServices.Update(gameTime);
-            _collisionService.Update(gameTime);
 
             base.Update(gameTime);
         }

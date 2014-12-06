@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Boxes.Collision;
 using Boxes.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,11 +10,14 @@ namespace Boxes.Entity
     {
         private List<IEntity> _entities;
         private SpriteBatch _sb;
+        private CollisionService _cs;
 
         public EntityManager(Game game)
         {
             _entities = new List<IEntity>();
             _sb = new SpriteBatch(game.GraphicsDevice);
+            _cs = new CollisionService(game);
+
         }
 
         public void AddEntity(IEntity ent)
