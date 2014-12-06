@@ -17,7 +17,6 @@ namespace Boxes.Entity
             _entities = new List<IEntity>();
             _sb = new SpriteBatch(game.GraphicsDevice);
             _cs = new CollisionService(game);
-
         }
 
         public void AddEntity(IEntity ent)
@@ -41,6 +40,7 @@ namespace Boxes.Entity
             {
                 ent.Update(gameTime);
             }
+            _cs.Update(gameTime);
         }
 
         public List<IEntity> GetEntities()

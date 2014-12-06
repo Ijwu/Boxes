@@ -11,10 +11,12 @@ namespace Boxes.Collision
     public class CollisionService
     {
         private Boxes _game;
+        private List<Chunk> _chunks; 
 
         public CollisionService(Game game)
         {
             _game = game as Boxes;
+            _chunks = new List<Chunk>();
         }
 
         public bool Collides(Rectangle box1, Rectangle box2)
@@ -40,11 +42,6 @@ namespace Boxes.Collision
         public void Update(GameTime time)
         {
             var et = _game.UpdateableServices.GetService(typeof (EntityManager)) as EntityManager;
-        }
-
-        public List<IEntity> GetAllEntitiesInCell()
-        {
-            return null;
         }
     }
 }
