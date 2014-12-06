@@ -109,7 +109,6 @@
   <ItemGroup>
     <Compile Include="Box.cs" />
     <Compile Include="Collision\CollisionService.cs" />
-    <Compile Include="Collision\Chunk.cs" />
     <Compile Include="Collision\CollisionEvent.cs" />
     <Compile Include="Entity\EntityAddedEvent.cs" />
     <Compile Include="Entity\IEntity.cs" />
