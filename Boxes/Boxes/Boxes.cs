@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Boxes.Collision;
 using Boxes.Entity;
 using Boxes.Services;
 using Microsoft.Xna.Framework;
@@ -22,13 +23,15 @@ namespace Boxes
         private SpriteBatch _spriteBatch;
         private AssetService _assetService;
         private EntityManager _entityManager;
+        private CollisionService _collisionService;
 
         public Boxes()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             _assetService = new AssetService(this);
-            IsMouseVisible = true;
+            _collisionService = new CollisionService(this);
+            this.IsMouseVisible = true;
         }
 
         /// <summary>
@@ -41,6 +44,7 @@ namespace Boxes
         {
             base.Initialize();
             this.Services.AddService(typeof(AssetService), _assetService);
+            this.Services.AddService(typeof (CollisionService), _collisionService);
         }
 
         /// <summary>
@@ -56,7 +60,7 @@ namespace Boxes
 
             for (int i = 1; i < 5000; i++)
             {
-                var box = new Box(Color.Red, new Vector2(i, 500000%i), _assetService.LoadContent<Texture2D>("box"))
+                var box = new Box(Color.Red, new Vector2(i, 50), _assetService.LoadContent<Texture2D>("box"))
                 {
                     Width = 10,
                     Height = 10,
@@ -64,11 +68,6 @@ namespace Boxes
                 };
                 _entityManager.AddEntity(box);   
             }
-            
-
-            this.Content.Load<Texture2D>("Box");
-
-            // TODO: use this.Content to load your game content here
         }
 
         /// <summary>

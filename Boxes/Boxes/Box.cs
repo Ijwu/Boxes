@@ -73,6 +73,11 @@ namespace Boxes
             sb.End();
         }
 
+        public Rectangle GetBoundingBox()
+        {
+            return new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+        }
+
         public void Dispose()
         {
             Disposing = true;
