@@ -48,6 +48,9 @@ namespace Boxes.Collision
 
         public void Update(GameTime time)
         {
+            var ent = _game.UpdateableServices.GetService(typeof (EntityManager)) as EntityManager;
+            List<Rectangle> ents = ent.GetEntities().Select(x => x.GetBoundingBox()).ToList();
+            ents.Sort((x, y) => x.X.CompareTo(y.X));
         }
     }
 }
