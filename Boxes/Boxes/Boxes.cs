@@ -18,15 +18,17 @@ namespace Boxes
     /// </summary>
     public class Boxes : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
         private AssetService _assetService;
+        private EntityManager _entityManager;
 
         public Boxes()
         {
-            graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             _assetService = new AssetService(this);
+            IsMouseVisible = true;
         }
 
         /// <summary>
@@ -37,7 +39,7 @@ namespace Boxes
         /// </summary>
         protected override void Initialize()
         {
-            this.Components.Add(new EntityManager(this));
+            base.Initialize();
             this.Services.AddService(typeof(AssetService), _assetService);
         }
 
@@ -48,7 +50,21 @@ namespace Boxes
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _entityManager = new EntityManager(this);
+            this.Components.Add(_entityManager);
+
+            for (int i = 1; i < 5000; i++)
+            {
+                var box = new Box(Color.Red, new Vector2(i, 500000%i), _assetService.LoadContent<Texture2D>("box"))
+                {
+                    Width = 10,
+                    Height = 10,
+                    Gravity = new Vector2(0, 1)
+                };
+                _entityManager.AddEntity(box);   
+            }
+            
 
             this.Content.Load<Texture2D>("Box");
 
@@ -86,9 +102,7 @@ namespace Boxes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
+            GraphicsDevice.Clear(Color.Black);
 
             base.Draw(gameTime);
         }
