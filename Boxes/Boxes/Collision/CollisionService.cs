@@ -26,6 +26,15 @@ namespace Boxes.Collision
                     _chunks[i/GridSpacing, j/GridSpacing] = new Chunk(i, j, GridSpacing);
                 }
             }
+
+            var ent = _game.UpdateableServices.GetService(typeof (EntityManager)) as EntityManager;
+            ent.EntityAdded += OnEntityAdded;
+        }
+
+        private void OnEntityAdded(object sender, EntityAddedEventArgs args)
+        {
+            var box = args.Entity.GetBoundingBox();
+            args.Entity.Chunk = _chunks[box.X/GridSpacing, box.Y/GridSpacing];
         }
 
         public static bool Collides(Rectangle box1, Rectangle box2)
@@ -52,9 +61,14 @@ namespace Boxes.Collision
         {
             var et = _game.UpdateableServices.GetService(typeof (EntityManager)) as EntityManager;
             var ents = et.GetEntities();
-            foreach (var entity in ents)
+            foreach (var chunk in _chunks)
             {
-                
+                chunk.Entities = new List<IEntity>();
+                foreach (var entity in ents)
+                {
+                    if (Collides(chunk.Area, entity.GetBoundingBox()))
+                        chunk.Entities.Add(entity);
+                }
             }
         }
     }

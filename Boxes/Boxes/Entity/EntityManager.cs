@@ -11,6 +11,7 @@ namespace Boxes.Entity
         private List<IEntity> _entities;
         private SpriteBatch _sb;
         private CollisionService _cs;
+        public event EntityAddedEvent EntityAdded;
 
         public EntityManager(Game game)
         {
@@ -22,6 +23,8 @@ namespace Boxes.Entity
         public void AddEntity(IEntity ent)
         {
             _entities.Add(ent);
+            if (EntityAdded != null)
+                EntityAdded(this, new EntityAddedEventArgs(ent));
         }
 
         public void Draw(GameTime gameTime)
