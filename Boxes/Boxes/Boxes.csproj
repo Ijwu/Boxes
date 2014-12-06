@@ -107,13 +107,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Box.cs" />
+    <Compile Include="Entity\Implementations\Box.cs" />
     <Compile Include="Collision\CollisionService.cs" />
     <Compile Include="Collision\CollisionEvent.cs" />
     <Compile Include="Compenents\FrameRateCounter.cs" />
     <Compile Include="Entity\EntityAddedEvent.cs" />
     <Compile Include="Entity\IEntity.cs" />
     <Compile Include="Entity\EntityManager.cs" />
+    <Compile Include="Entity\Implementations\Wall.cs" />
     <Compile Include="Entity\IUpdate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

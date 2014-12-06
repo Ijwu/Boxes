@@ -1,11 +1,9 @@
 ﻿using System;
 using Boxes.Collision;
-using Boxes.Entity;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Boxes
+namespace Boxes.Entity.Implementations
 {
     public class Box : IEntity, IDisposable
     {
@@ -35,6 +33,8 @@ namespace Boxes
             Height = 10;
             Color = Color.White;
             Texture = texture;
+
+            Initialize();
         }
 
         public Box(Color color, Vector2 position, Texture2D texture)
@@ -44,6 +44,8 @@ namespace Boxes
             Color = color;
             Position = position;
             Texture = texture;
+
+            Initialize();
         }
 
         public Box(int width, int height, Color color, Vector2 position, Texture2D texture)
@@ -53,6 +55,8 @@ namespace Boxes
             Color = color;
             Position = position;
             Texture = texture;
+
+            Initialize();
         }
 
         public void Initialize()
@@ -67,24 +71,31 @@ namespace Boxes
             Velocity -= Friction;
         }
 
+        public void InvokeCollides(object sender, CollisionEventArgs args)
+        {
+            if (Collides != null)
+                Collides.Invoke(sender, args);
+        }
+
         private void OnCollide(object sender, CollisionEventArgs args)
         {
-            if (Position.X > (args.Other.X + args.Other.Width)/2)
+            var otherBox = args.Other.GetBoundingBox();
+            if (Position.X > (otherBox.X + otherBox.Width) / 2)
             {
-                Position = new Vector2(args.Other.Right, Position.Y);
+                Position = new Vector2(otherBox.Right, Position.Y);
             }
             else
             {
-                Position = new Vector2(args.Other.Left+args.Other.Width, Position.Y);
+                Position = new Vector2(otherBox.Left + otherBox.Width, Position.Y);
             }
 
-            if (Position.Y > (args.Other.Y + args.Other.Height) / 2)
+            if (Position.Y > (otherBox.Y + otherBox.Height) / 2)
             {
-                Position = new Vector2(Position.X, args.Other.Bottom);
+                Position = new Vector2(Position.X, otherBox.Bottom);
             }
             else
             {
-                Position = new Vector2(Position.X, args.Other.Top+args.Other.Height);
+                Position = new Vector2(Position.X, otherBox.Top + otherBox.Height);
             }
         }
 

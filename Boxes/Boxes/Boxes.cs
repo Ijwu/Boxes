@@ -4,6 +4,7 @@ using System.Linq;
 using Boxes.Collision;
 using Boxes.Compenents;
 using Boxes.Entity;
+using Boxes.Entity.Implementations;
 using Boxes.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -26,6 +27,7 @@ namespace Boxes
         private EntityManager _entityManager;
         public UpdateableServicesCollection UpdateableServices;
         private SpriteFont _font;
+        private FrameRateCounter _fps;
 
         private int _frameRate = 0;
         private int _frameCounter = 0;
@@ -37,7 +39,8 @@ namespace Boxes
             Content.RootDirectory = "Content";
 
             _assetService = new AssetService(this);
-            
+            _fps = new FrameRateCounter(this);
+
             UpdateableServices = new UpdateableServicesCollection();
             this.IsMouseVisible = true;
 
@@ -55,7 +58,7 @@ namespace Boxes
         {
             base.Initialize();
             this.Services.AddService(typeof(AssetService), _assetService);
-            this.Components.Add(new FrameRateCounter(this));
+            _fps.Initialize();
         }
 
         /// <summary>
@@ -68,6 +71,7 @@ namespace Boxes
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _entityManager = new EntityManager(this);
             this.UpdateableServices.AddService(typeof(EntityManager),_entityManager);
+            this.Components.Add(_fps);
             _entityManager.Initialize();
 
             _font = _assetService.LoadContent<SpriteFont>("font");

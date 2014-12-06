@@ -1,4 +1,5 @@
 ﻿using System;
+using Boxes.Entity;
 using Microsoft.Xna.Framework;
 
 namespace Boxes.Collision
@@ -7,6 +8,11 @@ namespace Boxes.Collision
 
     public class CollisionEventArgs : EventArgs
     {
-        public Rectangle Other;
+        public IEntity Other;
+
+        public CollisionEventArgs(IEntity other)
+        {
+            Other = other;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Boxes.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,7 +8,7 @@ namespace Boxes.Compenents
 {
     public class FrameRateCounter : DrawableGameComponent
     {
-        private ContentManager _content;
+        private Game _game;
         private SpriteBatch _spriteBatch;
         private SpriteFont _spriteFont;
 
@@ -19,26 +20,16 @@ namespace Boxes.Compenents
         public FrameRateCounter(Game game)
             : base(game)
         {
-            _content = new ContentManager(game.Services);
+            _game = game;
         }
 
-
-        protected void LoadGraphicsContent(bool loadAllContent)
+        public override void Initialize()
         {
-            if (loadAllContent)
-            {
-                _spriteBatch = new SpriteBatch(GraphicsDevice);
-                _spriteFont = _content.Load<SpriteFont>("Font");
-            }
+            base.Initialize();
+            _spriteFont =
+                (_game.Services.GetService(typeof (AssetService)) as AssetService).LoadContent<SpriteFont>("font");
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
         }
-
-
-        protected void UnloadGraphicsContent(bool unloadAllContent)
-        {
-            if (unloadAllContent)
-                _content.Unload();
-        }
-
 
         public override void Update(GameTime gameTime)
         {
@@ -57,12 +48,11 @@ namespace Boxes.Compenents
         {
             frameCounter++;
 
-            string fps = string.Format("fps: {0}", frameRate);
+            string fps = frameRate.ToString();
 
             _spriteBatch.Begin();
 
-            _spriteBatch.DrawString(_spriteFont, fps, new Vector2(33, 33), Color.Black);
-            _spriteBatch.DrawString(_spriteFont, fps, new Vector2(32, 32), Color.White);
+            _spriteBatch.DrawString(_spriteFont, fps, new Vector2(1280,768)-_spriteFont.MeasureString(fps), Color.White);
 
             _spriteBatch.End();
         }

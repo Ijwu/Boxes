@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Boxes.Entity;
-using Boxes.Services;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Boxes.Collision
 {
@@ -18,12 +17,6 @@ namespace Boxes.Collision
             _game = game as Boxes;
 
             var ent = _game.UpdateableServices.GetService(typeof (EntityManager)) as EntityManager;
-            ent.EntityAdded += OnEntityAdded;
-        }
-
-        private void OnEntityAdded(object sender, EntityAddedEventArgs args)
-        {
-            
         }
 
         public static bool Collides(Rectangle box1, Rectangle box2)
@@ -39,18 +32,43 @@ namespace Boxes.Collision
                     select new Tuple<Rectangle, Rectangle>(x, y)).ToList();
         }
 
-        public bool CollidesWithScreenBounds(Rectangle box)
-        {
-            var bounds = _game.GraphicsDevice.Viewport.Bounds;
-            return (box.Left < bounds.Left || box.Right > bounds.Right || box.Bottom < bounds.Bottom ||
-                    box.Top > bounds.Top);
-        }
-
         public void Update(GameTime time)
         {
-            var ent = _game.UpdateableServices.GetService(typeof (EntityManager)) as EntityManager;
-            List<Rectangle> ents = ent.GetEntities().Select(x => x.GetBoundingBox()).ToList();
-            ents.Sort((x, y) => x.X.CompareTo(y.X));
+            Task.Factory.StartNew(RunCollisionChecks);
+        }
+
+        private void RunCollisionChecks()
+        {
+            var manager = _game.UpdateableServices.GetService(typeof(EntityManager)) as EntityManager;
+            List<IEntity> ents = manager.GetEntities();
+            ents.Sort((x, y) => x.GetBoundingBox().X.CompareTo(y.GetBoundingBox().Y));
+
+            var entsQueue = new Queue<IEntity>(ents);
+
+            for (int i = 0; i < entsQueue.Count; i++)
+            {
+                var ent = entsQueue.Dequeue();
+
+                var box = ent.GetBoundingBox();
+                foreach (var entity in entsQueue)
+                {
+                    var otherBox = entity.GetBoundingBox();
+                    if (box.Right > otherBox.X)
+                    {
+                        if (box.Bottom > otherBox.Y)
+                        {
+                            if (otherBox.Bottom > box.Y)
+                            {
+                                ent.InvokeCollides(this, new CollisionEventArgs(entity));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
         }
     }
 }
