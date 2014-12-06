@@ -11,13 +11,14 @@ namespace Boxes.Entity
         private List<IEntity> _entities;
         private SpriteBatch _sb;
         private CollisionService _cs;
+        private Game _game;
         public event EntityAddedEvent EntityAdded;
 
         public EntityManager(Game game)
         {
+            _game = game;
             _entities = new List<IEntity>();
             _sb = new SpriteBatch(game.GraphicsDevice);
-            _cs = new CollisionService(game);
         }
 
         public void AddEntity(IEntity ent)
@@ -25,6 +26,11 @@ namespace Boxes.Entity
             _entities.Add(ent);
             if (EntityAdded != null)
                 EntityAdded(this, new EntityAddedEventArgs(ent));
+        }
+
+        public void Initialize()
+        {
+            _cs = new CollisionService(_game);
         }
 
         public void Draw(GameTime gameTime)

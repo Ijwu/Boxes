@@ -61,8 +61,9 @@ namespace Boxes
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _entityManager = new EntityManager(this);
             this.UpdateableServices.AddService(typeof(EntityManager),_entityManager);
+            _entityManager.Initialize();
 
-            for (int i = 1; i < 5000; i++)
+            for (int i = 1; i < 1000; i++)
             {
                 var box = new Box(Color.Red, new Vector2(i, 50), _assetService.LoadContent<Texture2D>("box"))
                 {
