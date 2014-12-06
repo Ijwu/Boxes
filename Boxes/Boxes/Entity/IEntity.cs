@@ -5,6 +5,7 @@ namespace Boxes.Entity
 {
     public interface IEntity : IGameComponent, IUpdate
     {
+        bool Disposing { get; set; }
         void Draw(SpriteBatch sb, GameTime time);
     }
 }
