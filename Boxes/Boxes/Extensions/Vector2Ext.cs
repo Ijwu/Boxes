@@ -11,6 +11,12 @@ namespace Boxes.Extensions
             return new Vector2((float)Math.Cos(rads), (float)Math.Sin(rads));
         }
 
+        public static Vector2 FromAngle(double angle, double length)
+        {
+            var rads = angle * Math.PI / 180;
+            return new Vector2((float)(Math.Cos(rads) * length), (float)(Math.Sin(rads) * length));
+        }
+
         public static double GetAngle(Vector2 self, Vector2 other)
         {
             var delta = new Vector2(other.X - self.X, other.Y - self.Y);

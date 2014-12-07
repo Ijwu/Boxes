@@ -22,6 +22,7 @@ namespace Boxes
         public UpdateableServicesCollection UpdateableServices;
         private SpriteFont _font;
         private FrameRateCounter _fps;
+        private ClickMoveMode _currentMode = ClickMoveMode.Pull;
 
         public Boxes()
         {
@@ -67,7 +68,7 @@ namespace Boxes
             _font = _assetService.LoadContent<SpriteFont>("font");
             var tex = _assetService.LoadContent<Texture2D>("box");
 
-            _entityManager.AddEntity(new Box(Color.White, new Vector2(500), tex){Gravity = new Vector2(0,3), Friction = new Vector2(.001f)});
+            _entityManager.AddEntity(new Box(Color.White, new Vector2(500), tex){Gravity = new Vector2(0,1), Friction = new Vector2(.001f)});
         }
 
         /// <summary>
@@ -92,8 +93,13 @@ namespace Boxes
             if (Input.Input.MouseLeftClick)
             {
                 var mpos = new Vector2(Input.Input.MouseX, Input.Input.MouseY);
-                _entityManager.GetEntities().ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position,mpos))));
                 //vec2d.fromangle(getAngle(thing.position, vec2d(event.pos)), MOUSEPOWER)) #Push every square towards where you clicked with the power of MOUSEPOWER
+                switch (_currentMode)
+                {
+                    case ClickMoveMode.Weird:
+                        _entityManager.GetEntities().ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position,mpos),10)));
+                        break;
+                }
             }
 
             base.Update(gameTime);

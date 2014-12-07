@@ -107,6 +107,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClickMoveMode.cs" />
     <Compile Include="Entity\Implementations\Box.cs" />
     <Compile Include="Collision\CollisionService.cs" />
     <Compile Include="Collision\CollisionEvent.cs" />
