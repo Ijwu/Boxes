@@ -4,6 +4,7 @@ using Boxes.Compenents;
 using Boxes.Entity;
 using Boxes.Entity.Implementations;
 using Boxes.Extensions;
+using Boxes.Modifiers;
 using Boxes.Services;
 using Boxes.Input;
 using Microsoft.Xna.Framework;
@@ -24,6 +25,8 @@ namespace Boxes
         private SpriteFont _font;
         private FrameRateCounter _fps;
         private ClickMoveMode _currentMode = ClickMoveMode.Pull;
+        private ModifierTimer _modifierTimer = new ModifierTimer(500, 4000);
+        private Vector2 _clickPower = new Vector2(3, 10);
         Random _random = new Random();
 
         public Boxes()
@@ -52,6 +55,8 @@ namespace Boxes
             base.Initialize();
             this.Services.AddService(typeof(AssetService), _assetService);
             _fps.Initialize();
+            _modifierTimer.Elapsed += OnModifierTimerElapsed;
+            _modifierTimer.Run();
         }
 
         /// <summary>
@@ -103,16 +108,53 @@ namespace Boxes
                 {
                     case ClickMoveMode.Pull:
                         _entityManager.GetEntities()
-                            .ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position, mpos), 3,10)));
+                            .ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position, mpos), _clickPower.X,_clickPower.Y)));
                         break;
                     case ClickMoveMode.Push:
                         _entityManager.GetEntities()
-                            .ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position, mpos), 3,10)*-1));
+                            .ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position, mpos), _clickPower.X, _clickPower.Y) * -1));
                         break;
                 }
             }
 
             base.Update(gameTime);
+        }
+
+        private void OnModifierTimerElapsed(object sender, ModifierElapsedEventArgs args)
+        {
+            switch (args.Modifier)
+            {
+                case Modifier.Pull:
+                    _currentMode = ClickMoveMode.Pull;
+                    break;
+                case Modifier.Push:
+                    _currentMode = ClickMoveMode.Push;
+                    break;
+                case Modifier.GravityDown:
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, 1));
+                    _clickPower = new Vector2(3, 10);
+                    break;
+                case Modifier.GravityUp:
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, -1));
+                    _clickPower = new Vector2(3, 10);
+                    break;
+                case Modifier.GravityLeft:
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(-1, 0));
+                    _clickPower = new Vector2(5, 3);
+                    break;
+                case Modifier.GravityRight:
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(1, 0));
+                    _clickPower = new Vector2(5, 3);
+                    break;
+                case Modifier.RandomizeGravity:
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(_random.Next(0,2),_random.Next(0,2)));
+                    _clickPower = new Vector2(5, 5);
+                    break;
+                case Modifier.NoGravity:
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0));
+                    _clickPower = new Vector2(2,2);
+                    break;
+            }
         }
 
         /// <summary>
