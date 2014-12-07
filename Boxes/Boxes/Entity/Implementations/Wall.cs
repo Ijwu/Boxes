@@ -79,6 +79,11 @@ namespace Boxes.Entity.Implementations
             return new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
         }
 
+        public void Push(Vector2 vel)
+        {
+            
+        }
+
         public void Dispose()
         {
             Disposing = true;

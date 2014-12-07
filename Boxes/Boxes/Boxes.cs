@@ -1,18 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Boxes.Collision;
+using System.Diagnostics;
 using Boxes.Compenents;
 using Boxes.Entity;
 using Boxes.Entity.Implementations;
+using Boxes.Extensions;
 using Boxes.Services;
+using Boxes.Input;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 
 namespace Boxes
 {
@@ -71,48 +65,9 @@ namespace Boxes
             _entityManager.Initialize();
 
             _font = _assetService.LoadContent<SpriteFont>("font");
+            var tex = _assetService.LoadContent<Texture2D>("box");
 
-            var box = new Box(Color.Red, new Vector2(500, 500), _assetService.LoadContent<Texture2D>("box"))
-            {
-                Width = 100,
-                Height = 100,
-                Gravity = new Vector2(0, 1),
-                Friction = new Vector2(1, 1)
-            };
-            _entityManager.AddEntity(box);
-
-            box = new Box(Color.Red, new Vector2(700, 500), _assetService.LoadContent<Texture2D>("box"))
-            {
-                Width = 100,
-                Height = 100,
-                Gravity = new Vector2(0, 1),
-                Friction = new Vector2(1, 1)
-            };
-            _entityManager.AddEntity(box);  
-
-            //for (int i = 1; i < 30; i++)
-            //{
-            //    var box = new Box(Color.Red, new Vector2(500,500), _assetService.LoadContent<Texture2D>("box"))
-            //    {
-            //        Width = 100,
-            //        Height = 100,
-            //        Gravity = new Vector2(0, 1),
-            //        Friction = new Vector2(1,1)
-            //    };
-            //    _entityManager.AddEntity(box);   
-            //}
-
-            _entityManager.AddEntity(new Wall(1280, 10, Color.LightGray, new Vector2(0, 750),
-                _assetService.LoadContent<Texture2D>("box")));
-
-            _entityManager.AddEntity(new Wall(1280, 10, Color.LightGray, new Vector2(0, 10),
-                _assetService.LoadContent<Texture2D>("box")));
-
-            _entityManager.AddEntity(new Wall(10, 768, Color.LightGray, new Vector2(10, 0),
-                _assetService.LoadContent<Texture2D>("box")));
-
-            _entityManager.AddEntity(new Wall(10, 768, Color.LightGray, new Vector2(1260, 0),
-                _assetService.LoadContent<Texture2D>("box")));
+            _entityManager.AddEntity(new Box(Color.White, new Vector2(500), tex){Gravity = new Vector2(0,3), Friction = new Vector2(.001f)});
         }
 
         /// <summary>
@@ -131,11 +86,15 @@ namespace Boxes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-
+            Input.Input.Update();
             this.UpdateableServices.Update(gameTime);
+
+            if (Input.Input.MouseLeftClick)
+            {
+                var mpos = new Vector2(Input.Input.MouseX, Input.Input.MouseY);
+                _entityManager.GetEntities().ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position,mpos))));
+                //vec2d.fromangle(getAngle(thing.position, vec2d(event.pos)), MOUSEPOWER)) #Push every square towards where you clicked with the power of MOUSEPOWER
+            }
 
             base.Update(gameTime);
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Boxes.Collision;
 using Boxes.Extensions;
 using Microsoft.Xna.Framework;
@@ -56,8 +57,8 @@ namespace Boxes.Entity.Implementations
 
         public void Update(GameTime gameTime)
         {
-            Position += (Velocity * (float)(gameTime.ElapsedGameTime.TotalSeconds+.5));
-            Position += (Gravity * (float)(gameTime.ElapsedGameTime.TotalSeconds+.5));
+            Position += (Velocity * (float)(gameTime.ElapsedGameTime.TotalSeconds + .5));
+
             if (Velocity.X > 0)
                 Velocity += new Vector2(Friction.X, 0);
 
@@ -66,18 +67,32 @@ namespace Boxes.Entity.Implementations
 
             if (Position.X > 1280)
             {
-                Position = new Vector2(640, Position.Y);
+                Position = new Vector2(1280-Width, Position.Y);
+                Velocity = new Vector2(0, Velocity.Y);
+            }
+
+            if (Velocity.Y > 0 || Position.Y < 768-Height)
+            {
+                Velocity += (Gravity * (float)(gameTime.ElapsedGameTime.TotalSeconds + .5));
+            }
+
+            if (Position.X < 0)
+            {
+                Position = new Vector2(0, Position.Y);
+                Velocity = new Vector2(0, Velocity.Y);
             }
 
             if (Position.Y > 768)
             {
-                Position = new Vector2(Position.X, 384);
+                Position = new Vector2(Position.X, 768-Height);
+                Velocity = new Vector2(Velocity.X, 0);
             }
-        } 
 
-        public void Push(Vector2 vel)
-        {
-            Velocity += vel;
+            if (Position.Y < 0)
+            {
+                Position = new Vector2(Position.X, 0);
+                Velocity = new Vector2(Velocity.X, 0);
+            }
         }
 
         public void Draw(SpriteBatch sb, GameTime time)
@@ -88,6 +103,11 @@ namespace Boxes.Entity.Implementations
         public Rectangle GetBoundingBox()
         {
             return new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+        }
+
+        public void Push(Vector2 vel)
+        {
+            Velocity += vel;
         }
 
         public void Dispose()
