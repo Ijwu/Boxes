@@ -27,7 +27,9 @@ namespace Boxes
         private ClickMoveMode _currentMode = ClickMoveMode.Pull;
         private ModifierTimer _modifierTimer = new ModifierTimer(2000);
         private Vector2 _clickPower = new Vector2(3, 10);
-        Random _random = new Random();
+        private Texture2D _arrow;
+        private Random _random = new Random();
+        private Modifier _currentGravity;
 
         public Boxes()
         {
@@ -74,6 +76,7 @@ namespace Boxes
 
             _font = _assetService.LoadContent<SpriteFont>("font");
             var tex = _assetService.LoadContent<Texture2D>("box");
+            _arrow = _assetService.LoadContent<Texture2D>("arrow");
 
             for (int i = 0; i < 500; i++)
             {
@@ -103,7 +106,6 @@ namespace Boxes
             if (Input.Input.MouseLeftClick)
             {
                 var mpos = new Vector2(Input.Input.MouseX, Input.Input.MouseY);
-                //vec2d.fromangle(getAngle(thing.position, vec2d(event.pos)), MOUSEPOWER)) #Push every square towards where you clicked with the power of MOUSEPOWER
                 switch (_currentMode)
                 {
                     case ClickMoveMode.Pull:
@@ -133,26 +135,32 @@ namespace Boxes
                 case Modifier.GravityDown:
                     _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, 1));
                     _clickPower = new Vector2(3, 10);
+                    _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityUp:
                     _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, -1));
                     _clickPower = new Vector2(3, 10);
+                    _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityLeft:
                     _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(-1, 0));
                     _clickPower = new Vector2(5, 3);
+                    _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityRight:
                     _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(1, 0));
                     _clickPower = new Vector2(5, 3);
+                    _currentGravity = args.Modifier;
                     break;
                 case Modifier.RandomizeGravity:
                     _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(_random.Next(0,2),_random.Next(0,2)));
                     _clickPower = new Vector2(5, 5);
+                    _currentGravity = args.Modifier;
                     break;
                 case Modifier.NoGravity:
                     _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0));
                     _clickPower = new Vector2(2,2);
+                    _currentGravity = args.Modifier;
                     break;
             }
         }
@@ -166,6 +174,27 @@ namespace Boxes
             GraphicsDevice.Clear(Color.Black);
 
             this.UpdateableServices.Draw(gameTime);
+
+            _spriteBatch.Begin();
+            var pos = GraphicsDevice.Viewport.Bounds.Center.ToVector2() - new Point(_arrow.Width, _arrow.Height).ToVector2();
+            switch (_currentGravity)
+            {
+                case Modifier.GravityDown:
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White, (float)(1.5*Math.PI), new Vector2(_arrow.Width / 2, _arrow.Height / 2), 1.0f, SpriteEffects.None, 0f);
+                    break;
+                case Modifier.GravityLeft:
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White, (float)Math.PI, new Vector2(_arrow.Width / 2, _arrow.Height / 2), 1.0f, SpriteEffects.None, 0f);
+                    break;
+                case Modifier.GravityRight:
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White, 0, new Vector2(_arrow.Width / 2, _arrow.Height / 2), 1.0f, SpriteEffects.None, 0f);
+                    break;
+                case Modifier.GravityUp:
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White, (float)(Math.PI/2), new Vector2(_arrow.Width / 2, _arrow.Height / 2), 1.0f, SpriteEffects.None, 0f);
+                    break;
+                default:
+                    break;
+            }
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }

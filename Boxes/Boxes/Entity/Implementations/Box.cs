@@ -65,10 +65,7 @@ namespace Boxes.Entity.Implementations
             if (Velocity.Y > 0)
                 Velocity -= new Vector2(0, Friction.Y);
 
-            if (Velocity.Y > 0 || Position.Y < 748-Height)
-            {
-                Velocity += (Gravity * (float)(gameTime.ElapsedGameTime.TotalSeconds + .5));
-            }
+            Velocity += (Gravity * (float)(gameTime.ElapsedGameTime.TotalSeconds + .5));
 
             if (Position.X > 1260)
             {
