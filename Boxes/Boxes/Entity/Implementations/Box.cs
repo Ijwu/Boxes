@@ -65,32 +65,32 @@ namespace Boxes.Entity.Implementations
             if (Velocity.Y > 0)
                 Velocity += new Vector2(0, Friction.Y);
 
-            if (Position.X > 1280)
-            {
-                Position = new Vector2(1280-Width, Position.Y);
-                Velocity = new Vector2(0, Velocity.Y);
-            }
-
-            if (Velocity.Y > 0 || Position.Y < 768-Height)
+            if (Velocity.Y > 0 || Position.Y < 748-Height)
             {
                 Velocity += (Gravity * (float)(gameTime.ElapsedGameTime.TotalSeconds + .5));
             }
 
-            if (Position.X < 0)
+            if (Position.X > 1260)
             {
-                Position = new Vector2(0, Position.Y);
+                Position = new Vector2(1260-Width, Position.Y);
                 Velocity = new Vector2(0, Velocity.Y);
             }
 
-            if (Position.Y > 768)
+            if (Position.X < 20)
             {
-                Position = new Vector2(Position.X, 768-Height);
+                Position = new Vector2(20, Position.Y);
+                Velocity = new Vector2(0, Velocity.Y);
+            }
+
+            if (Position.Y > 748)
+            {
+                Position = new Vector2(Position.X, 748-Height);
                 Velocity = new Vector2(Velocity.X, 0);
             }
 
-            if (Position.Y < 0)
+            if (Position.Y < 20)
             {
-                Position = new Vector2(Position.X, 0);
+                Position = new Vector2(Position.X, 20);
                 Velocity = new Vector2(Velocity.X, 0);
             }
         }

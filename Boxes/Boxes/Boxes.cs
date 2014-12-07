@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using Boxes.Compenents;
 using Boxes.Entity;
@@ -23,6 +24,7 @@ namespace Boxes
         private SpriteFont _font;
         private FrameRateCounter _fps;
         private ClickMoveMode _currentMode = ClickMoveMode.Pull;
+        Random _random = new Random();
 
         public Boxes()
         {
@@ -68,7 +70,10 @@ namespace Boxes
             _font = _assetService.LoadContent<SpriteFont>("font");
             var tex = _assetService.LoadContent<Texture2D>("box");
 
-            _entityManager.AddEntity(new Box(Color.White, new Vector2(500), tex){Gravity = new Vector2(0,1), Friction = new Vector2(.001f)});
+            for (int i = 0; i < 500; i++)
+            {
+                _entityManager.AddEntity(new Box(new Color(_random.Next(100, 256), _random.Next(100, 256), _random.Next(100, 256)), new Vector2(_random.Next(0, 1280), _random.Next(0, 768)), tex) { Gravity = new Vector2(0, 1), Friction = new Vector2(.001f)});   
+            }
         }
 
         /// <summary>
@@ -96,8 +101,13 @@ namespace Boxes
                 //vec2d.fromangle(getAngle(thing.position, vec2d(event.pos)), MOUSEPOWER)) #Push every square towards where you clicked with the power of MOUSEPOWER
                 switch (_currentMode)
                 {
-                    case ClickMoveMode.Weird:
-                        _entityManager.GetEntities().ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position,mpos),10)));
+                    case ClickMoveMode.Pull:
+                        _entityManager.GetEntities()
+                            .ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position, mpos), 3,10)));
+                        break;
+                    case ClickMoveMode.Push:
+                        _entityManager.GetEntities()
+                            .ForEach(x => x.Push(Vector2Ext.FromAngle(Vector2Ext.GetAngle(x.Position, mpos), 3,10)*-1));
                         break;
                 }
             }

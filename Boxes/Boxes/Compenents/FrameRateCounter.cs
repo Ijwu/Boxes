@@ -52,7 +52,7 @@ namespace Boxes.Compenents
 
             _spriteBatch.Begin();
 
-            _spriteBatch.DrawString(_spriteFont, fps, new Vector2(1280,768)-_spriteFont.MeasureString(fps)-_spriteFont.MeasureString(fps), Color.White);
+            _spriteBatch.DrawString(_spriteFont, fps, new Vector2(1280,768)-_spriteFont.MeasureString(fps), Color.White);
 
             _spriteBatch.End();
         }
