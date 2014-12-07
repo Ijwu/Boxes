@@ -68,7 +68,11 @@ namespace Boxes.Entity.Implementations
         {
             Position += Velocity;
             Position += Gravity;
-            Velocity -= Friction;
+            if (Velocity.X > 0)
+                Velocity += new Vector2(Friction.X, 0);
+
+            if (Velocity.Y > 0)
+                Velocity += new Vector2(0, Friction.Y);
         }
 
         public void InvokeCollides(object sender, CollisionEventArgs args)
@@ -80,13 +84,22 @@ namespace Boxes.Entity.Implementations
         private void OnCollide(object sender, CollisionEventArgs args)
         {
             var otherBox = args.Other.GetBoundingBox();
-            if (Position.X > (otherBox.Width/2) + otherBox.X)
+            if (Position.X > otherBox.Center.X)
             {
-                Position = new Vector2(otherBox.Right, Position.Y);
+                Push(new Vector2(1,0));
             }
             else
             {
-                Position = new Vector2(otherBox.Left-otherBox.Width, Position.Y);
+                Push(new Vector2(-1,0));
+            }
+
+            if (Position.Y > otherBox.Center.Y)
+            {
+                Push(new Vector2(0,1));
+            }
+            else
+            {
+                Push(new Vector2(0,-1));
             }
         }
 

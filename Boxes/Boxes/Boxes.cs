@@ -29,10 +29,6 @@ namespace Boxes
         private SpriteFont _font;
         private FrameRateCounter _fps;
 
-        private int _frameRate = 0;
-        private int _frameCounter = 0;
-        private TimeSpan _elapsedTime = TimeSpan.Zero;
-
         public Boxes()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -78,11 +74,12 @@ namespace Boxes
 
             for (int i = 1; i < 1000; i++)
             {
-                var box = new Box(Color.Red, new Vector2(i, 50), _assetService.LoadContent<Texture2D>("box"))
+                var box = new Box(Color.Red, new Vector2(i, 500), _assetService.LoadContent<Texture2D>("box"))
                 {
                     Width = 10,
                     Height = 10,
-                    Gravity = new Vector2(0, 1)
+                    Gravity = new Vector2(0, 1),
+                    Friction = new Vector2(.001f,.001f)
                 };
                 _entityManager.AddEntity(box);   
             }
@@ -113,15 +110,6 @@ namespace Boxes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            _elapsedTime += gameTime.ElapsedGameTime;
-
-            if (_elapsedTime > TimeSpan.FromSeconds(1))
-            {
-                _elapsedTime -= TimeSpan.FromSeconds(1);
-                _frameRate = _frameCounter;
-                _frameCounter = 0;
-            }
-
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
@@ -137,15 +125,7 @@ namespace Boxes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            _frameCounter++;
-
             GraphicsDevice.Clear(Color.Black);
-
-            var sb = new SpriteBatch(GraphicsDevice);
-            var x = _frameRate.ToString();
-            sb.Begin();
-            sb.DrawString(_font, x, new Vector2(1280,768)-_font.MeasureString(x), Color.White);
-            sb.End();
 
             this.UpdateableServices.Draw(gameTime);
 
