@@ -57,7 +57,7 @@ namespace Boxes.Entity.Implementations
 
         public void Update(GameTime gameTime)
         {
-            Position += (Velocity * (float)(gameTime.ElapsedGameTime.TotalSeconds + .5));
+            Position += (Velocity);
 
             if (Velocity.X > 0)
                 Velocity -= new Vector2(Friction.X, 0);

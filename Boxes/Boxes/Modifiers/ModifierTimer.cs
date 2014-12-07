@@ -93,6 +93,12 @@ namespace Boxes.Modifiers
             _timer.Stop();
             _timer.Dispose();
         }
+
+        public void AdjustTimeRange(double min, double max)
+        {
+            _min = min;
+            _max = max;
+        }
     }
 
     public delegate void ModifierElapsedEvent(object sender, ModifierElapsedEventArgs args);

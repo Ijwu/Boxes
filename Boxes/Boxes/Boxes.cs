@@ -30,6 +30,7 @@ namespace Boxes
         private Texture2D _arrow;
         private Random _random = new Random();
         private Modifier _currentGravity;
+        private double _difficulty = 1;
 
         public Boxes()
         {
@@ -103,7 +104,7 @@ namespace Boxes
             Input.Input.Update();
             this.UpdateableServices.Update(gameTime);
 
-            if (Input.Input.MouseLeftClick)
+            if (Input.Input.MouseLeftClick || Input.Input.MouseRightClick)
             {
                 var mpos = new Vector2(Input.Input.MouseX, Input.Input.MouseY);
                 switch (_currentMode)
@@ -119,6 +120,8 @@ namespace Boxes
                 }
             }
 
+            _difficulty += 1*gameTime.ElapsedGameTime.TotalMilliseconds;
+
             base.Update(gameTime);
         }
 
@@ -133,33 +136,33 @@ namespace Boxes
                     _currentMode = ClickMoveMode.Push;
                     break;
                 case Modifier.GravityDown:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, 1));
-                    _clickPower = new Vector2(3, 10);
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, 2));
+                    _clickPower = new Vector2(10, 10);
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityUp:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, -1));
-                    _clickPower = new Vector2(3, 10);
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, -2));
+                    _clickPower = new Vector2(10, 10);
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityLeft:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(-1, 0));
-                    _clickPower = new Vector2(5, 3);
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(-2, 0));
+                    _clickPower = new Vector2(10, 10);
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityRight:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(1, 0));
-                    _clickPower = new Vector2(5, 3);
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(2, 0));
+                    _clickPower = new Vector2(10, 10);
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.RandomizeGravity:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(_random.Next(0,2),_random.Next(0,2)));
-                    _clickPower = new Vector2(5, 5);
+                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(_random.Next(0,4),_random.Next(0,4)));
+                    _clickPower = new Vector2(_random.Next(2, 8), _random.Next(2, 8));
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.NoGravity:
                     _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0));
-                    _clickPower = new Vector2(2,2);
+                    _clickPower = new Vector2(4,4);
                     _currentGravity = args.Modifier;
                     break;
             }
@@ -177,6 +180,7 @@ namespace Boxes
 
             _spriteBatch.Begin();
             var pos = GraphicsDevice.Viewport.Bounds.Center.ToVector2() - new Point(_arrow.Width, _arrow.Height).ToVector2();
+            _spriteBatch.DrawString(_font, "POOP", new Vector2(500, 500), Color.Red);
             switch (_currentGravity)
             {
                 case Modifier.GravityDown:
