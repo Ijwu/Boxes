@@ -60,10 +60,10 @@ namespace Boxes.Entity.Implementations
             Position += (Velocity * (float)(gameTime.ElapsedGameTime.TotalSeconds + .5));
 
             if (Velocity.X > 0)
-                Velocity += new Vector2(Friction.X, 0);
+                Velocity -= new Vector2(Friction.X, 0);
 
             if (Velocity.Y > 0)
-                Velocity += new Vector2(0, Friction.Y);
+                Velocity -= new Vector2(0, Friction.Y);
 
             if (Velocity.Y > 0 || Position.Y < 748-Height)
             {

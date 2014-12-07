@@ -25,7 +25,7 @@ namespace Boxes
         private SpriteFont _font;
         private FrameRateCounter _fps;
         private ClickMoveMode _currentMode = ClickMoveMode.Pull;
-        private ModifierTimer _modifierTimer = new ModifierTimer(500, 4000);
+        private ModifierTimer _modifierTimer = new ModifierTimer(2000);
         private Vector2 _clickPower = new Vector2(3, 10);
         Random _random = new Random();
 
@@ -77,7 +77,7 @@ namespace Boxes
 
             for (int i = 0; i < 500; i++)
             {
-                _entityManager.AddEntity(new Box(new Color(_random.Next(100, 256), _random.Next(100, 256), _random.Next(100, 256)), new Vector2(_random.Next(0, 1280), _random.Next(0, 768)), tex) { Gravity = new Vector2(0, 1), Friction = new Vector2(.001f)});   
+                _entityManager.AddEntity(new Box(new Color(_random.Next(100, 256), _random.Next(100, 256), _random.Next(100, 256)), new Vector2(_random.Next(0, 1280), _random.Next(0, 768)), tex) { Gravity = new Vector2(0, 1), Friction = new Vector2(.1f)});   
             }
         }
 
