@@ -59,7 +59,7 @@ namespace Boxes.Modifiers
         private Modifier ChooseModifier()
         {
             double rnd = _random.NextDouble();
-            Modifier selectedModifier = Modifier.Pull;
+            var selectedModifier = Modifier.Pull;
             foreach (var key in Weights.Keys)
             {
                 if (rnd < Weights[key])
@@ -104,11 +104,6 @@ namespace Boxes.Modifiers
         public ModifierElapsedEventArgs(Modifier modifier)
         {
             Modifier = modifier;
-        }
-
-        public ModifierElapsedEventArgs()
-        {
-            throw new NotImplementedException();
         }
     }
 }
