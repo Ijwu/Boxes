@@ -67,8 +67,8 @@ namespace Boxes.Entity.Implementations
 
         public void Update(GameTime gameTime)
         {
-            Position += Velocity;
-            Position += Gravity;
+            Position += (Velocity * (float)(gameTime.ElapsedGameTime.TotalSeconds+.5));
+            Position += (Gravity * (float)(gameTime.ElapsedGameTime.TotalSeconds+.5));
             if (Velocity.X > 0)
                 Velocity += new Vector2(Friction.X, 0);
 
@@ -84,10 +84,37 @@ namespace Boxes.Entity.Implementations
 
         private void OnCollide(object sender, CollisionEventArgs args)
         {
-            var otherBox = args.Other.GetBoundingBox();
-            var myBox = GetBoundingBox();
+            var mybox = GetBoundingBox();
+            var otherbox = args.Other.GetBoundingBox();
 
-            
+            float x1 = Math.Abs(mybox.Right - otherbox.Left);
+            float x2 = Math.Abs(mybox.Left - otherbox.Right);
+            float y1 = Math.Abs(mybox.Bottom - otherbox.Top);
+            float y2 = Math.Abs(mybox.Top - otherbox.Bottom);
+
+            var diff = new Vector2(0);
+
+            // calculate displacement along X-axis
+            if (x1 < x2)
+            {
+                diff.X = -x1;
+            }
+            else if (x1 > x2)
+            {
+                diff.X = x2;
+            }
+
+            // calculate displacement along Y-axis
+            if (y1 < y2)
+            {
+                diff.Y = -y1;
+            }
+            else if (y1 > y2)
+            {
+                diff.Y = y2;
+            }
+
+            Position += diff;
         }
 
         /*
