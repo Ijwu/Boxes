@@ -74,6 +74,16 @@ namespace Boxes.Entity.Implementations
 
             if (Velocity.Y > 0)
                 Velocity += new Vector2(0, Friction.Y);
+
+            if (Position.X > 1280)
+            {
+                Position = new Vector2(640, Position.Y);
+            }
+
+            if (Position.Y > 768)
+            {
+                Position = new Vector2(Position.X, 384);
+            }
         }
 
         public void InvokeCollides(object sender, CollisionEventArgs args)
@@ -84,55 +94,53 @@ namespace Boxes.Entity.Implementations
 
         private void OnCollide(object sender, CollisionEventArgs args)
         {
-            var mybox = GetBoundingBox();
-            var otherbox = args.Other.GetBoundingBox();
+            var otherBox = args.Other.GetBoundingBox();
+            var myBox = GetBoundingBox();
 
-            float x1 = Math.Abs(mybox.Right - otherbox.Left);
-            float x2 = Math.Abs(mybox.Left - otherbox.Right);
-            float y1 = Math.Abs(mybox.Bottom - otherbox.Top);
-            float y2 = Math.Abs(mybox.Top - otherbox.Bottom);
+            var difference = new Vector2();
 
-            var diff = new Vector2(0);
+            difference.X += otherBox.Center.X - myBox.Center.X;
+            difference.Y += otherBox.Center.Y - myBox.Center.Y;
+            difference *= -1;
 
-            // calculate displacement along X-axis
-            if (x1 < x2)
-            {
-                diff.X = -x1;
-            }
-            else if (x1 > x2)
-            {
-                diff.X = x2;
-            }
+            difference.X += myBox.Center.X + difference.X;
+            difference.Y += myBox.Center.Y + difference.Y;
 
-            // calculate displacement along Y-axis
-            if (y1 < y2)
-            {
-                diff.Y = -y1;
-            }
-            else if (y1 > y2)
-            {
-                diff.Y = y2;
-            }
+            Position = difference;
 
-            Position += diff;
-        }
 
-        /*
-         if not self.colliderect(rect):
-            return self
+            //difference = vec2d(0,0)
+            //center = vec2d(self.center)
+            //otherCenter = vec2d(rect.center)
+            //difference.x += otherCenter.x - center.x
+            //difference.y += otherCenter.y - center.y
+            //difference *= -1
         
-        difference = vec2d(0,0)
-        center = vec2d(self.center)
-        otherCenter = vec2d(rect.center)
-        difference.x += otherCenter.x - center.x
-        difference.y += otherCenter.y - center.y
-        difference *= -1
-        
-        difference.x = center.x + difference.x
-        difference.y = center.y + difference.y
-        
-        return Rect(difference.x, difference.y, self.width, self.height)
-         */
+            //difference.x = center.x + difference.x
+            //difference.y = center.y + difference.y
+
+
+            //var otherBox = args.Other.GetBoundingBox();
+            //var myBox = GetBoundingBox();
+
+            //if (myBox.Center.X >= otherBox.Center.X)
+            //{
+            //    Position = new Vector2(Position.X + (otherBox.Right - myBox.Left), Position.Y);
+            //}
+            //else
+            //{
+            //    Position = new Vector2(Position.X - (myBox.Right - otherBox.Left), Position.Y);   
+            //}
+
+            //if (myBox.Center.Y >= otherBox.Center.Y)
+            //{
+            //    Position = new Vector2(Position.X, Position.Y + (otherBox.Bottom - myBox.Top));
+            //}
+            //else
+            //{
+            //    Position = new Vector2(Position.X, Position.Y - (myBox.Bottom - otherBox.Top));
+            //}
+        }   
 
         public void Push(Vector2 vel)
         {

@@ -72,19 +72,40 @@ namespace Boxes
 
             _font = _assetService.LoadContent<SpriteFont>("font");
 
-            for (int i = 1; i < 3; i++)
+            var box = new Box(Color.Red, new Vector2(500, 500), _assetService.LoadContent<Texture2D>("box"))
             {
-                var box = new Box(Color.Red, new Vector2(500,500), _assetService.LoadContent<Texture2D>("box"))
-                {
-                    Width = 100,
-                    Height = 100,
-                    Gravity = new Vector2(0, 1),
-                    Friction = new Vector2(1,1)
-                };
-                _entityManager.AddEntity(box);   
-            }
+                Width = 100,
+                Height = 100,
+                Gravity = new Vector2(0, 1),
+                Friction = new Vector2(1, 1)
+            };
+            _entityManager.AddEntity(box);
+
+            box = new Box(Color.Red, new Vector2(700, 500), _assetService.LoadContent<Texture2D>("box"))
+            {
+                Width = 100,
+                Height = 100,
+                Gravity = new Vector2(0, 1),
+                Friction = new Vector2(1, 1)
+            };
+            _entityManager.AddEntity(box);  
+
+            //for (int i = 1; i < 30; i++)
+            //{
+            //    var box = new Box(Color.Red, new Vector2(500,500), _assetService.LoadContent<Texture2D>("box"))
+            //    {
+            //        Width = 100,
+            //        Height = 100,
+            //        Gravity = new Vector2(0, 1),
+            //        Friction = new Vector2(1,1)
+            //    };
+            //    _entityManager.AddEntity(box);   
+            //}
 
             _entityManager.AddEntity(new Wall(1280, 10, Color.LightGray, new Vector2(0, 750),
+                _assetService.LoadContent<Texture2D>("box")));
+
+            _entityManager.AddEntity(new Wall(1280, 10, Color.LightGray, new Vector2(0, 10),
                 _assetService.LoadContent<Texture2D>("box")));
 
             _entityManager.AddEntity(new Wall(10, 768, Color.LightGray, new Vector2(10, 0),
