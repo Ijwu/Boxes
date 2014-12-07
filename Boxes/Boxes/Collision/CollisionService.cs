@@ -40,23 +40,6 @@ namespace Boxes.Collision
         {
             var manager = _game.UpdateableServices.GetService(typeof(EntityManager)) as EntityManager;
             List<IEntity> ents = manager.GetEntities();
-
-            foreach (var entity in ents)
-            {
-                foreach (var ent in ents)
-                {
-                    if (entity.GetBoundingBox().Intersects(ent.GetBoundingBox()))
-                    {
-                        entity.InvokeCollides(this, new CollisionEventArgs(ent));
-                    }
-                }
-            }
-        }
-
-        private void RunCollisionChecks2()
-        {
-            var manager = _game.UpdateableServices.GetService(typeof(EntityManager)) as EntityManager;
-            List<IEntity> ents = manager.GetEntities();
             ents.Sort((x, y) => x.GetBoundingBox().X.CompareTo(y.GetBoundingBox().Y));
 
             var entsQueue = new Queue<IEntity>(ents);
@@ -75,7 +58,7 @@ namespace Boxes.Collision
                         {
                             if (otherBox.Bottom > box.Y)
                             {
-                                ent.InvokeCollides(this, new CollisionEventArgs(entity));
+                                //piss
                             }
                         }
                     }

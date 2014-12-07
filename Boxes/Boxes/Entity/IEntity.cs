@@ -9,7 +9,5 @@ namespace Boxes.Entity
         bool Disposing { get; set; }
         void Draw(SpriteBatch sb, GameTime time);
         Rectangle GetBoundingBox();
-        event CollisionEvent Collides;
-        void InvokeCollides(object sender, CollisionEventArgs args);
     }
 }
