@@ -1,5 +1,6 @@
 ﻿using System;
 using Boxes.Collision;
+using Boxes.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -84,24 +85,27 @@ namespace Boxes.Entity.Implementations
         private void OnCollide(object sender, CollisionEventArgs args)
         {
             var otherBox = args.Other.GetBoundingBox();
-            if (Position.X > otherBox.Center.X)
-            {
-                Push(new Vector2(1,0));
-            }
-            else
-            {
-                Push(new Vector2(-1,0));
-            }
+            var myBox = GetBoundingBox();
 
-            if (Position.Y > otherBox.Center.Y)
-            {
-                Push(new Vector2(0,1));
-            }
-            else
-            {
-                Push(new Vector2(0,-1));
-            }
+            
         }
+
+        /*
+         if not self.colliderect(rect):
+            return self
+        
+        difference = vec2d(0,0)
+        center = vec2d(self.center)
+        otherCenter = vec2d(rect.center)
+        difference.x += otherCenter.x - center.x
+        difference.y += otherCenter.y - center.y
+        difference *= -1
+        
+        difference.x = center.x + difference.x
+        difference.y = center.y + difference.y
+        
+        return Rect(difference.x, difference.y, self.width, self.height)
+         */
 
         public void Push(Vector2 vel)
         {

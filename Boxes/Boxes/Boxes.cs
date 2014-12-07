@@ -72,14 +72,14 @@ namespace Boxes
 
             _font = _assetService.LoadContent<SpriteFont>("font");
 
-            for (int i = 1; i < 1000; i++)
+            for (int i = 1; i < 3; i++)
             {
-                var box = new Box(Color.Red, new Vector2(i, 500), _assetService.LoadContent<Texture2D>("box"))
+                var box = new Box(Color.Red, new Vector2(500,500), _assetService.LoadContent<Texture2D>("box"))
                 {
-                    Width = 10,
-                    Height = 10,
+                    Width = 100,
+                    Height = 100,
                     Gravity = new Vector2(0, 1),
-                    Friction = new Vector2(.001f,.001f)
+                    Friction = new Vector2(1,1)
                 };
                 _entityManager.AddEntity(box);   
             }

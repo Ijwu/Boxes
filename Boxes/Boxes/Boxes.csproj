@@ -116,6 +116,7 @@
     <Compile Include="Entity\EntityManager.cs" />
     <Compile Include="Entity\Implementations\Wall.cs" />
     <Compile Include="Entity\IUpdate.cs" />
+    <Compile Include="Extensions\PointEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Boxes.cs" />
