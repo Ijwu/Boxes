@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 using Boxes.Collision;
 using Boxes.Services;
 using Microsoft.Xna.Framework;
@@ -24,6 +25,7 @@ namespace Boxes.Entity
         public void AddEntity(IEntity ent)
         {
             _entities.Add(ent);
+            ent.Initialize();
             if (EntityAdded != null)
                 EntityAdded(this, new EntityAddedEventArgs(ent));
         }
@@ -36,20 +38,29 @@ namespace Boxes.Entity
         public void Draw(GameTime gameTime)
         {
             _sb.Begin();
-            foreach (var ent in _entities)
+            lock(_entities)
             {
-                ent.Draw(_sb, gameTime);
+                foreach (var ent in _entities)
+                {
+                    ent.Draw(_sb, gameTime);
+                    
+                }
             }
             _sb.End();
         }
 
         public void Update(GameTime gameTime)
         {
-            foreach (var ent in _entities)
+            lock(_entities)
             {
-                ent.Update(gameTime);
+                foreach (var ent in _entities)
+                {
+                    if (!ent.Disposing)
+                        ent.Update(gameTime);
+                }
+                _entities.RemoveAll(x => x.Disposing);
             }
-            _cs.Update(gameTime);
+            //_cs.Update(gameTime);
         }
 
         public List<IEntity> GetEntities()

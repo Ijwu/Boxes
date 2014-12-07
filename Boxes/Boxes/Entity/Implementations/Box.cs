@@ -58,36 +58,40 @@ namespace Boxes.Entity.Implementations
         public void Update(GameTime gameTime)
         {
             Position += (Velocity);
+            
+            if (Gravity != Vector2.Zero)
+            {
 
-            if (Velocity.X > 0)
-                Velocity -= new Vector2(Friction.X, 0);
+                if (Velocity.X > 0)
+                    Velocity -= new Vector2(Friction.X, 0);
 
-            if (Velocity.Y > 0)
-                Velocity -= new Vector2(0, Friction.Y);
+                if (Velocity.Y > 0)
+                    Velocity -= new Vector2(0, Friction.Y);
+            }
 
             Velocity += (Gravity * (float)(gameTime.ElapsedGameTime.TotalSeconds + .5));
 
-            if (Position.X > 1260)
+            if (Position.X > 1230)
             {
-                Position = new Vector2(1260-Width, Position.Y);
+                Position = new Vector2(1230-Width, Position.Y);
                 Velocity = new Vector2(0, Velocity.Y);
             }
 
-            if (Position.X < 20)
+            if (Position.X < 50)
             {
-                Position = new Vector2(20, Position.Y);
+                Position = new Vector2(50, Position.Y);
                 Velocity = new Vector2(0, Velocity.Y);
             }
 
-            if (Position.Y > 748)
+            if (Position.Y > 718)
             {
-                Position = new Vector2(Position.X, 748-Height);
+                Position = new Vector2(Position.X, 718-Height);
                 Velocity = new Vector2(Velocity.X, 0);
             }
 
-            if (Position.Y < 20)
+            if (Position.Y < 50)
             {
-                Position = new Vector2(Position.X, 20);
+                Position = new Vector2(Position.X, 50);
                 Velocity = new Vector2(Velocity.X, 0);
             }
         }

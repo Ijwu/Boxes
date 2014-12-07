@@ -1,10 +1,12 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Boxes.Compenents;
 using Boxes.Entity;
 using Boxes.Entity.Implementations;
 using Boxes.Extensions;
 using Boxes.Modifiers;
+using Boxes.Objective;
 using Boxes.Services;
 using Boxes.Input;
 using Microsoft.Xna.Framework;
@@ -25,12 +27,17 @@ namespace Boxes
         private SpriteFont _font;
         private FrameRateCounter _fps;
         private ClickMoveMode _currentMode = ClickMoveMode.Pull;
-        private ModifierTimer _modifierTimer = new ModifierTimer(2000);
+        private ModifierTimer _modifierTimer = new ModifierTimer(4000);
         private Vector2 _clickPower = new Vector2(3, 10);
         private Texture2D _arrow;
         private Random _random = new Random();
-        private Modifier _currentGravity;
+        private Modifier _currentGravity = Modifier.GravityDown;
         private double _difficulty = 1;
+        private Texture2D _boxTexture;
+        private bool _hasObjective;
+        private bool _gameLost;
+        private double _score;
+        private int _toAdd;
 
         public Boxes()
         {
@@ -59,6 +66,7 @@ namespace Boxes
             this.Services.AddService(typeof(AssetService), _assetService);
             _fps.Initialize();
             _modifierTimer.Elapsed += OnModifierTimerElapsed;
+            _modifierTimer.Elapsed += AdjustDifficulty;
             _modifierTimer.Run();
         }
 
@@ -76,13 +84,10 @@ namespace Boxes
             _entityManager.Initialize();
 
             _font = _assetService.LoadContent<SpriteFont>("font");
-            var tex = _assetService.LoadContent<Texture2D>("box");
+            _boxTexture = _assetService.LoadContent<Texture2D>("box");
             _arrow = _assetService.LoadContent<Texture2D>("arrow");
 
-            for (int i = 0; i < 500; i++)
-            {
-                _entityManager.AddEntity(new Box(new Color(_random.Next(100, 256), _random.Next(100, 256), _random.Next(100, 256)), new Vector2(_random.Next(0, 1280), _random.Next(0, 768)), tex) { Gravity = new Vector2(0, 1), Friction = new Vector2(.1f)});   
-            }
+            _entityManager.AddEntity(new Box(new Color(_random.Next(100, 256), _random.Next(100, 256), _random.Next(100, 256)), new Vector2(_random.Next(0, 1280), _random.Next(0, 768)), _boxTexture) { Gravity = new Vector2(0, 1) });   
         }
 
         /// <summary>
@@ -119,14 +124,160 @@ namespace Boxes
                         break;
                 }
             }
+            if (!_hasObjective)
+            {
+                var objective = CreateObjectiveInRandomArea();
+                objective.Elapsed += OnObjectiveAreaElapsed;
+                lock(_entityManager.GetEntities())
+                {
+                    switch (_currentGravity)
+                    {
+                        case Modifier.GravityUp:
+                            _entityManager.AddEntity(objective);
+                            _hasObjective = true;
+                            break;
+                        case Modifier.GravityDown:
+                            _entityManager.AddEntity(objective);
+                            _hasObjective = true;
+                            break;
+                        case Modifier.GravityLeft:
+                            _entityManager.AddEntity(objective);
+                            _hasObjective = true;
+                            break;
+                        case Modifier.GravityRight:
+                            _entityManager.AddEntity(objective);
+                            _hasObjective = true;
+                            break;
+                        case Modifier.NoGravity:
+                            _entityManager.AddEntity(objective);
+                            _hasObjective = true;
+                            break;
+                    }
+                }
+            }
+            Vector2 grav = new Vector2();
+            switch (_currentGravity)
+            {
+                case Modifier.GravityUp:
+                    grav = new Vector2(0, -1);
+                    break;
+                case Modifier.GravityDown:
+                    grav = new Vector2(0, 1);
+                    break;
+                case Modifier.GravityLeft:
+                    grav = new Vector2(-1, 0);
+                    break;
+                case Modifier.GravityRight:
+                    grav = new Vector2(1, 0);
+                    break;
+                case Modifier.NoGravity:
+                    grav = new Vector2(0);
+                    break;
+            }
 
-            _difficulty += 1*gameTime.ElapsedGameTime.TotalMilliseconds;
+            for (int i = 0; i < _toAdd; i++)
+            {
+                var objectives = _entityManager.GetEntities().Where(x => x is ObjectiveArea).ToList();
+                var pos = new Vector2(_random.Next(0, 1280), _random.Next(0, 768));
+                while (objectives.Any(x => x.GetBoundingBox().Contains((int)pos.X, (int)pos.Y)))
+                {
+                    pos = new Vector2(_random.Next(0, 1280), _random.Next(0, 768));    
+                }
+                _entityManager.AddEntity(new Box(new Color(_random.Next(100, 256), _random.Next(100, 256), _random.Next(100, 256)), pos, _boxTexture)
+                {
+                    Gravity = grav
+                });   
+            }
+            _toAdd = 0;
 
             base.Update(gameTime);
         }
 
+        private ObjectiveArea CreateObjectiveInRandomArea()
+        {
+            var bounds = GraphicsDevice.Viewport.Bounds;
+            int rand = _random.Next(0, 8);
+            ObjectiveArea objective = null;
+            double ttl = 1500 - (2000*_difficulty*10/100);
+            switch (rand)
+            {
+                case 0:
+                    objective = new ObjectiveArea(new Rectangle(0, bounds.Height / 2, bounds.Width, bounds.Height / 2),
+                    ttl, _boxTexture);
+                    break;
+                case 1:
+                    objective = new ObjectiveArea(new Rectangle(0, 0, bounds.Width, bounds.Height / 2),
+                    ttl, _boxTexture);
+                    break;
+                case 2:
+                    objective = new ObjectiveArea(new Rectangle(bounds.Width/2, 0, bounds.Width/2, bounds.Height),
+                    ttl, _boxTexture);
+                    break;
+                case 3:
+                    objective = new ObjectiveArea(new Rectangle(0, 0, bounds.Width/2, bounds.Height),
+                    ttl, _boxTexture);
+                    break;
+                case 4:
+                    objective = new ObjectiveArea(new Rectangle(0, 0, bounds.Width / 2, bounds.Height / 2),
+                    ttl, _boxTexture);
+                    break;
+                case 5:
+                    objective = new ObjectiveArea(new Rectangle(0, bounds.Height / 2, bounds.Width / 2, bounds.Height / 2),
+                    ttl, _boxTexture);
+                    break;
+                case 6:
+                    objective = new ObjectiveArea(new Rectangle(bounds.Width/2, bounds.Height / 2, bounds.Width/2, bounds.Height / 2),
+                    ttl, _boxTexture);
+                    break;
+                case 7:
+                    objective = new ObjectiveArea(new Rectangle(bounds.Width/2, 0, bounds.Width/2, bounds.Height / 2),
+                    ttl, _boxTexture);
+                    break;
+            }
+            return objective;
+        }
+
+        private void OnObjectiveAreaElapsed(object sender, ObjectiveAreaElapsedArgs args)
+        {
+            Debug.WriteLine("I have expired.");
+            (sender as ObjectiveArea).Dispose();
+            _hasObjective = false;
+
+            var entities = _entityManager.GetEntities();
+            ObjectiveArea thisArea = sender as ObjectiveArea;
+
+            entities.ForEach(x =>
+            {
+                if (!x.GetBoundingBox().Intersects(thisArea.GetBoundingBox()))
+                {
+                    x.Dispose();
+                }
+            });
+            var entCount = entities.Count(x => !x.Disposing);
+
+            if (entCount == 0)
+            {
+                _gameLost = true;
+            }
+
+            _score += entCount + (entCount*_difficulty/100);
+
+            _toAdd = (int)(5 + (300*_difficulty/100) + entCount*_difficulty/100);
+        }
+
+        private void AdjustDifficulty(object sender, ModifierElapsedEventArgs args)
+        {
+            _difficulty += .1333337;
+            var range = _modifierTimer.GetTimeRange();
+            _modifierTimer.AdjustTimeRange(Math.Max(range.X - (3*_difficulty / 100 * range.X), 2000));
+            _clickPower = new Vector2((float)(10+10*_difficulty/100), (float)(10+10*_difficulty/100));
+            Debug.WriteLine(_difficulty);
+            Debug.WriteLine(range);
+        }
+
         private void OnModifierTimerElapsed(object sender, ModifierElapsedEventArgs args)
         {
+            Debug.WriteLine("New Modifier: {0}", args.Modifier);
             switch (args.Modifier)
             {
                 case Modifier.Pull:
@@ -136,33 +287,51 @@ namespace Boxes
                     _currentMode = ClickMoveMode.Push;
                     break;
                 case Modifier.GravityDown:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, 2));
-                    _clickPower = new Vector2(10, 10);
+                    _entityManager.GetEntities().ForEach(x =>
+                    {
+                        x.Gravity = new Vector2(0, 2);
+                        x.Friction = Vector2.Zero;
+                    });
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityUp:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0, -2));
-                    _clickPower = new Vector2(10, 10);
+                    _entityManager.GetEntities().ForEach(x =>
+                    {
+                        x.Gravity = new Vector2(0, -2);
+                        x.Friction = Vector2.Zero;
+                    });
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityLeft:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(-2, 0));
-                    _clickPower = new Vector2(10, 10);
+                    _entityManager.GetEntities().ForEach(x =>
+                    {
+                        x.Gravity = new Vector2(-2, 0);
+                        x.Friction = Vector2.Zero;
+                    });
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.GravityRight:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(2, 0));
-                    _clickPower = new Vector2(10, 10);
+                    _entityManager.GetEntities().ForEach(x =>
+                    {
+                        x.Gravity = new Vector2(2, 0);
+                        x.Friction = Vector2.Zero;
+                    });
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.RandomizeGravity:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(_random.Next(0,4),_random.Next(0,4)));
-                    _clickPower = new Vector2(_random.Next(2, 8), _random.Next(2, 8));
+                    _entityManager.GetEntities().ForEach(x =>
+                    {
+                        x.Gravity = new Vector2(_random.Next(0, 4), _random.Next(0, 4));
+                        x.Friction = Vector2.Zero;
+                    });
                     _currentGravity = args.Modifier;
                     break;
                 case Modifier.NoGravity:
-                    _entityManager.GetEntities().ForEach(x => x.Gravity = new Vector2(0));
-                    _clickPower = new Vector2(4,4);
+                    _entityManager.GetEntities().ForEach(x =>
+                    {
+                        x.Gravity = new Vector2(0);
+                        x.Friction = new Vector2(1, 1);
+                    });                 
                     _currentGravity = args.Modifier;
                     break;
             }
@@ -180,22 +349,19 @@ namespace Boxes
 
             _spriteBatch.Begin();
             var pos = GraphicsDevice.Viewport.Bounds.Center.ToVector2() - new Point(_arrow.Width, _arrow.Height).ToVector2();
-            _spriteBatch.DrawString(_font, "POOP", new Vector2(500, 500), Color.Red);
             switch (_currentGravity)
             {
                 case Modifier.GravityDown:
-                    _spriteBatch.Draw(_arrow, pos, null, Color.White, (float)(1.5*Math.PI), new Vector2(_arrow.Width / 2, _arrow.Height / 2), 1.0f, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .2f, (float)(1.5*Math.PI), new Vector2(0,0), 1.0f, SpriteEffects.None, 0f);
                     break;
                 case Modifier.GravityLeft:
-                    _spriteBatch.Draw(_arrow, pos, null, Color.White, (float)Math.PI, new Vector2(_arrow.Width / 2, _arrow.Height / 2), 1.0f, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .2f, (float)Math.PI, new Vector2(0, 0), 1.0f, SpriteEffects.None, 0f);
                     break;
                 case Modifier.GravityRight:
-                    _spriteBatch.Draw(_arrow, pos, null, Color.White, 0, new Vector2(_arrow.Width / 2, _arrow.Height / 2), 1.0f, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .2f, 0, new Vector2(0, 0), 1.0f, SpriteEffects.None, 0f);
                     break;
                 case Modifier.GravityUp:
-                    _spriteBatch.Draw(_arrow, pos, null, Color.White, (float)(Math.PI/2), new Vector2(_arrow.Width / 2, _arrow.Height / 2), 1.0f, SpriteEffects.None, 0f);
-                    break;
-                default:
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .2f, (float)(Math.PI / 2), new Vector2(0, 0), 1.0f, SpriteEffects.None, 0f);
                     break;
             }
             _spriteBatch.End();

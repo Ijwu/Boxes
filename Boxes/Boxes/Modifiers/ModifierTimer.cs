@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Timers;
+using Microsoft.Xna.Framework;
 
 namespace Boxes.Modifiers
 {
@@ -21,10 +22,8 @@ namespace Boxes.Modifiers
 
         private readonly Dictionary<Modifier, float> Weights = new Dictionary<Modifier, float>()
         {
-            {Modifier.Pull, .60f},
-            {Modifier.Push, .10f},
-            {Modifier.RandomizeGravity, .05f},
-            {Modifier.GravityDown, .05f},
+            {Modifier.Pull, .65f},
+            {Modifier.GravityDown, .15f},
             {Modifier.GravityLeft, .05f},
             {Modifier.GravityRight, .05f},
             {Modifier.GravityUp, .05f},
@@ -52,7 +51,6 @@ namespace Boxes.Modifiers
         private void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
             _timer.Interval = _random.NextDouble()*_max + _min;
-            Debug.WriteLine(_timer.Interval);
             OnModifierTimerElapsed(this, new ModifierElapsedEventArgs(ChooseModifier()));
         }
 
@@ -98,6 +96,17 @@ namespace Boxes.Modifiers
         {
             _min = min;
             _max = max;
+        }
+
+        public void AdjustTimeRange(double time)
+        {
+            _min = time;
+            _max = time;
+        }
+
+        public Vector2 GetTimeRange()
+        {
+            return new Vector2((float)_min, (float)_max);
         }
     }
 
