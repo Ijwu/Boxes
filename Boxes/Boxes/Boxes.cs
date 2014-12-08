@@ -42,6 +42,8 @@ namespace Boxes
         private double _score;
         private int _toAdd;
         private Color _flashColor;
+        private bool _instructionScreen = true;
+        private bool _paused = false;
 
         public Boxes()
         {
@@ -103,6 +105,12 @@ namespace Boxes
             // TODO: Unload any non ContentManager content here
         }
 
+        protected override void OnDeactivated(object sender, EventArgs args)
+        {
+            base.OnDeactivated(sender, args);
+            _paused = true;
+        }
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -111,6 +119,29 @@ namespace Boxes
         protected override void Update(GameTime gameTime)
         {
             Input.Input.Update();
+
+            if (Input.Input.IsKeyTapped(Keys.Escape))
+            {
+                _paused = true;
+            }
+
+            if (_paused)
+            {
+                if (Input.Input.IsKeyTapped(Keys.Enter))
+                {
+                    _paused = false;
+                }
+                return;
+            }
+
+            if (_instructionScreen)
+            {
+                if (Input.Input.IsKeyTapped(Keys.Enter))
+                {
+                    _instructionScreen = false;
+                }
+                return;
+            }
 
             if (_gameLost)
             {
@@ -364,9 +395,6 @@ namespace Boxes
                     _currentGravity = args.Modifier;
                     break;
             }
-
-            _flashScreen = true;
-            _flashColor = Color.White;
         }
 
         /// <summary>
@@ -407,6 +435,14 @@ namespace Boxes
             }
             _spriteBatch.DrawString(_font, ((int)_score).ToString(), new Vector2(40, 10), Color.White);
 
+            if (_paused)
+            {
+                var bounds = GraphicsDevice.Viewport.Bounds;
+                var center = new Vector2(bounds.Center.X, bounds.Center.Y);
+                _spriteBatch.DrawString(_font, "Paused.", center - _font.MeasureString("Paused."), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Press Enter to unpause.", center - _font.MeasureString("Press Enter to unpause.") - new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+            }
+
             if (_gameLost)
             {
                 var bounds = GraphicsDevice.Viewport.Bounds;
@@ -415,6 +451,20 @@ namespace Boxes
                 _spriteBatch.DrawString(_font, "You lost all your boxes.", center - _font.MeasureString("You lose all your boxes."), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
                 _spriteBatch.DrawString(_font, "Press Enter to restart.", center - _font.MeasureString("Press Enter to restart.") + new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
                 _spriteBatch.DrawString(_font, string.Format("Final Score: {0}", (int)_score), center - _font.MeasureString(string.Format("Final Score: {0}", (int)_score)) + new Vector2(0, 80), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+            }
+
+            if (_instructionScreen)
+            {
+                var bounds = GraphicsDevice.Viewport.Bounds;
+                var center = new Vector2(bounds.Center.X, bounds.Center.Y);
+                _spriteBatch.DrawString(_font, "Thanks for playing Boxes!", center - _font.MeasureString("Thanks for playing Boxes!") - new Vector2(0, 120), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Click the screen to pull the boxes to your cursor.", center - _font.MeasureString("Click the screen to pull the boxes to your cursor.") - new Vector2(0, 80), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Get the boxes into the highlighted zone.", center - _font.MeasureString("Get the boxes into the highlighted zone.") - new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "You get points for each box that made it", center - _font.MeasureString("You get points for each box that made it"), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "and lose points for each that didn't.", center - _font.MeasureString("and lose points for each that didn't.") + new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Boxes that don't make it disappear.", center - _font.MeasureString("Boxes that don't make it disappear.") + new Vector2(0, 80), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Don't lose all your boxes!", center - _font.MeasureString("Don't lose all your boxes!") + new Vector2(0, 120), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Press Enter to start.", center - _font.MeasureString("Press Enter to start.") + new Vector2(0, 160), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
             }
 
             _spriteBatch.End();

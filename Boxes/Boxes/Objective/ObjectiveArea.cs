@@ -90,8 +90,6 @@ namespace Boxes.Objective
             _innerRect.Height = newHeight;
             _innerRect.X = mainRect.X + widthReduction/2;
             _innerRect.Y = mainRect.Y + heightReduction/2;
-            //_innerRect.X = mainRect.Center.X - _innerRect.Width;
-            //_innerRect.Y = mainRect.Center.Y - _innerRect.Height;
         }
 
         public Rectangle GetBoundingBox()
