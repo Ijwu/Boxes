@@ -11,6 +11,7 @@ using Boxes.Services;
 using Boxes.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Boxes
 {
@@ -28,16 +29,19 @@ namespace Boxes
         private FrameRateCounter _fps;
         private ClickMoveMode _currentMode = ClickMoveMode.Pull;
         private ModifierTimer _modifierTimer = new ModifierTimer(4000);
+        private Modifier _currentGravity = Modifier.GravityDown;
         private Vector2 _clickPower = new Vector2(3, 10);
+        private bool _hasObjective;
+        private bool _flashScreen;
+        private int _maxBoxes = 1;
         private Texture2D _arrow;
         private Random _random = new Random();
-        private Modifier _currentGravity = Modifier.GravityDown;
         private double _difficulty = 1;
         private Texture2D _boxTexture;
-        private bool _hasObjective;
         private bool _gameLost;
         private double _score;
         private int _toAdd;
+        private Color _flashColor;
 
         public Boxes()
         {
@@ -107,6 +111,27 @@ namespace Boxes
         protected override void Update(GameTime gameTime)
         {
             Input.Input.Update();
+
+            if (_gameLost)
+            {
+                if (Input.Input.IsKeyTapped(Keys.Enter))
+                {
+                    _entityManager.GetEntities().Clear();
+                    _score = 0;
+                    _difficulty = 1;
+                    _modifierTimer = new ModifierTimer(4000);
+                    _currentGravity = Modifier.GravityDown;
+                    _clickPower = new Vector2(10, 10);
+                    _hasObjective = false;
+                    _flashScreen = false;
+                    _maxBoxes = 1;
+                    _toAdd = 0;
+                    _gameLost = false;
+                    _entityManager.AddEntity(new Box(new Color(_random.Next(100, 256), _random.Next(100, 256), _random.Next(100, 256)), new Vector2(_random.Next(0, 1280), _random.Next(0, 768)), _boxTexture) { Gravity = new Vector2(0, 1) });   
+                }
+                return;
+            }
+
             this.UpdateableServices.Update(gameTime);
 
             if (Input.Input.MouseLeftClick || Input.Input.MouseRightClick)
@@ -239,7 +264,6 @@ namespace Boxes
 
         private void OnObjectiveAreaElapsed(object sender, ObjectiveAreaElapsedArgs args)
         {
-            Debug.WriteLine("I have expired.");
             (sender as ObjectiveArea).Dispose();
             _hasObjective = false;
 
@@ -260,9 +284,17 @@ namespace Boxes
                 _gameLost = true;
             }
 
-            _score += entCount + (entCount*_difficulty/100);
+            var all = _entityManager.GetEntities().Count;
+            var penalty = (all - entCount);
+            penalty = penalty * 3;
+
+            _score += entCount - penalty;
 
             _toAdd = (int)(5 + (300*_difficulty/100) + entCount*_difficulty/100);
+
+            _flashColor = new Color(_random.Next(100, 200), _random.Next(100, 200), _random.Next(100, 200)) * .5f;
+
+            _maxBoxes = Math.Max(entCount, _maxBoxes);
         }
 
         private void AdjustDifficulty(object sender, ModifierElapsedEventArgs args)
@@ -270,14 +302,11 @@ namespace Boxes
             _difficulty += .1333337;
             var range = _modifierTimer.GetTimeRange();
             _modifierTimer.AdjustTimeRange(Math.Max(range.X - (3*_difficulty / 100 * range.X), 2000));
-            _clickPower = new Vector2((float)(10+10*_difficulty/100), (float)(10+10*_difficulty/100));
-            Debug.WriteLine(_difficulty);
-            Debug.WriteLine(range);
+            _clickPower = new Vector2((float)(10+100*_difficulty/100), (float)(10+100*_difficulty/100)); 
         }
 
         private void OnModifierTimerElapsed(object sender, ModifierElapsedEventArgs args)
         {
-            Debug.WriteLine("New Modifier: {0}", args.Modifier);
             switch (args.Modifier)
             {
                 case Modifier.Pull:
@@ -335,6 +364,9 @@ namespace Boxes
                     _currentGravity = args.Modifier;
                     break;
             }
+
+            _flashScreen = true;
+            _flashColor = Color.White;
         }
 
         /// <summary>
@@ -343,27 +375,48 @@ namespace Boxes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            if (_flashScreen)
+            {
+                GraphicsDevice.Clear(_flashColor);
+                _flashScreen = false;
+            }
+            else
+            {
+                GraphicsDevice.Clear(_flashColor);
+            }
 
             this.UpdateableServices.Draw(gameTime);
 
             _spriteBatch.Begin();
-            var pos = GraphicsDevice.Viewport.Bounds.Center.ToVector2() - new Point(_arrow.Width, _arrow.Height).ToVector2();
+            var pos = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
+            var origin = new Vector2(_arrow.Width/2, _arrow.Height/2);
             switch (_currentGravity)
             {
                 case Modifier.GravityDown:
-                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .2f, (float)(1.5*Math.PI), new Vector2(0,0), 1.0f, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .1f, (float)(Math.PI / 2), origin, 1.0f, SpriteEffects.None, 0f);
                     break;
                 case Modifier.GravityLeft:
-                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .2f, (float)Math.PI, new Vector2(0, 0), 1.0f, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .1f, (float)Math.PI, origin, 1.0f, SpriteEffects.None, 0f);
                     break;
                 case Modifier.GravityRight:
-                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .2f, 0, new Vector2(0, 0), 1.0f, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .1f, 0, origin, 1.0f, SpriteEffects.None, 0f);
                     break;
                 case Modifier.GravityUp:
-                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .2f, (float)(Math.PI / 2), new Vector2(0, 0), 1.0f, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_arrow, pos, null, Color.White * .1f, (float)(1.5 * Math.PI), origin, 1.0f, SpriteEffects.None, 0f);
                     break;
             }
+            _spriteBatch.DrawString(_font, ((int)_score).ToString(), new Vector2(40, 10), Color.White);
+
+            if (_gameLost)
+            {
+                var bounds = GraphicsDevice.Viewport.Bounds;
+                var center = new Vector2(bounds.Center.X, bounds.Center.Y);
+                _spriteBatch.DrawString(_font, "Game over!", center-_font.MeasureString("Game over!")-new Vector2(0,40),Color.White,0f,Vector2.Zero,2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "You lost all your boxes.", center - _font.MeasureString("You lose all your boxes."), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Press Enter to restart.", center - _font.MeasureString("Press Enter to restart.") + new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, string.Format("Final Score: {0}", (int)_score), center - _font.MeasureString(string.Format("Final Score: {0}", (int)_score)) + new Vector2(0, 80), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+            }
+
             _spriteBatch.End();
 
             base.Draw(gameTime);

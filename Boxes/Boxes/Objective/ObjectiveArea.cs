@@ -59,11 +59,11 @@ namespace Boxes.Objective
         public void Initialize()
         {
             _outerColor = Color.LightGray;
-            _outerColor *= .2f;
+            _outerColor *= .4f;
             _innerColor = Color.GhostWhite;
-            _innerColor *= .2f;
+            _innerColor *= .4f;
             _startTime = DateTime.Now;
-            _timer.Interval = Math.Max(TimeToLive, 200);
+            _timer.Interval = Math.Max(TimeToLive, 750);
             _timer.AutoReset = true;
             _timer.Start();
         }

@@ -12,6 +12,7 @@ namespace Boxes.Modifiers
         private double _min;
         private double _max;
         private Random _random = new Random();
+        private Modifier _lastModifier;
 
 
         //private readonly Dictionary<Modifier, float> Weights = new Dictionary<Modifier, float>()
@@ -22,13 +23,21 @@ namespace Boxes.Modifiers
 
         private readonly Dictionary<Modifier, float> Weights = new Dictionary<Modifier, float>()
         {
-            {Modifier.Pull, .65f},
-            {Modifier.GravityDown, .15f},
+            {Modifier.GravityDown, .40f},
+            {Modifier.GravityLeft, .15f},
+            {Modifier.GravityRight, .15f},
+            {Modifier.GravityUp, .10f},
+            {Modifier.NoGravity, .20f}
+        };
+
+        private readonly Dictionary<Modifier, float> AlternateWeights = new Dictionary<Modifier, float>()
+        {
+            {Modifier.GravityDown, .80f},
             {Modifier.GravityLeft, .05f},
             {Modifier.GravityRight, .05f},
             {Modifier.GravityUp, .05f},
             {Modifier.NoGravity, .05f}
-        }; 
+        };
 
         public event ModifierElapsedEvent Elapsed;
 
@@ -51,7 +60,12 @@ namespace Boxes.Modifiers
         private void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
             _timer.Interval = _random.NextDouble()*_max + _min;
-            OnModifierTimerElapsed(this, new ModifierElapsedEventArgs(ChooseModifier()));
+            ModifierElapsedEventArgs thing;
+            if (_lastModifier != Modifier.GravityDown)
+                thing = new ModifierElapsedEventArgs(ChooseAlternateModifier());
+            else
+                thing = new ModifierElapsedEventArgs(ChooseModifier());
+            OnModifierTimerElapsed(this, thing);
         }
 
         private Modifier ChooseModifier()
@@ -66,6 +80,26 @@ namespace Boxes.Modifiers
                     break;
                 }
                 rnd -= Weights[key];
+            }
+            if (selectedModifier == Modifier.Push)
+            {
+                _timer.Interval = 100;
+            }
+            return selectedModifier;
+        }
+
+        private Modifier ChooseAlternateModifier()
+        {
+            double rnd = _random.NextDouble();
+            var selectedModifier = Modifier.Pull;
+            foreach (var key in AlternateWeights.Keys)
+            {
+                if (rnd < AlternateWeights[key])
+                {
+                    selectedModifier = key;
+                    break;
+                }
+                rnd -= AlternateWeights[key];
             }
             if (selectedModifier == Modifier.Push)
             {
