@@ -109,6 +109,26 @@ namespace Boxes
         {
             base.OnDeactivated(sender, args);
             _paused = true;
+            PauseAllObjectives();
+        }
+
+        private void PauseAllObjectives()
+        {
+            lock (_entityManager.GetEntities())
+            {
+                _entityManager.GetEntities().Where(x => x is ObjectiveArea).ToList().ForEach(x => x.Dispose());
+            }
+        }
+
+        private void UnpauseAllObjectives()
+        {
+            var objective = CreateObjectiveInRandomArea();
+            objective.Elapsed += OnObjectiveAreaElapsed;
+            lock (_entityManager.GetEntities())
+            {
+                _entityManager.AddEntity(objective);
+                _hasObjective = true;
+            }
         }
 
         /// <summary>
@@ -123,6 +143,8 @@ namespace Boxes
             if (Input.Input.IsKeyTapped(Keys.Escape))
             {
                 _paused = true;
+                PauseAllObjectives();
+                _modifierTimer.Pause();
             }
 
             if (_paused)
@@ -130,6 +152,8 @@ namespace Boxes
                 if (Input.Input.IsKeyTapped(Keys.Enter))
                 {
                     _paused = false;
+                    UnpauseAllObjectives();
+                    _modifierTimer.Run();
                 }
                 return;
             }
@@ -186,29 +210,8 @@ namespace Boxes
                 objective.Elapsed += OnObjectiveAreaElapsed;
                 lock(_entityManager.GetEntities())
                 {
-                    switch (_currentGravity)
-                    {
-                        case Modifier.GravityUp:
-                            _entityManager.AddEntity(objective);
-                            _hasObjective = true;
-                            break;
-                        case Modifier.GravityDown:
-                            _entityManager.AddEntity(objective);
-                            _hasObjective = true;
-                            break;
-                        case Modifier.GravityLeft:
-                            _entityManager.AddEntity(objective);
-                            _hasObjective = true;
-                            break;
-                        case Modifier.GravityRight:
-                            _entityManager.AddEntity(objective);
-                            _hasObjective = true;
-                            break;
-                        case Modifier.NoGravity:
-                            _entityManager.AddEntity(objective);
-                            _hasObjective = true;
-                            break;
-                    }
+                    _entityManager.AddEntity(objective);
+                    _hasObjective = true;
                 }
             }
             Vector2 grav = new Vector2();
@@ -435,24 +438,6 @@ namespace Boxes
             }
             _spriteBatch.DrawString(_font, ((int)_score).ToString(), new Vector2(40, 10), Color.White);
 
-            if (_paused)
-            {
-                var bounds = GraphicsDevice.Viewport.Bounds;
-                var center = new Vector2(bounds.Center.X, bounds.Center.Y);
-                _spriteBatch.DrawString(_font, "Paused.", center - _font.MeasureString("Paused."), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-                _spriteBatch.DrawString(_font, "Press Enter to unpause.", center - _font.MeasureString("Press Enter to unpause.") - new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-            }
-
-            if (_gameLost)
-            {
-                var bounds = GraphicsDevice.Viewport.Bounds;
-                var center = new Vector2(bounds.Center.X, bounds.Center.Y);
-                _spriteBatch.DrawString(_font, "Game over!", center-_font.MeasureString("Game over!")-new Vector2(0,40),Color.White,0f,Vector2.Zero,2f, SpriteEffects.None, 0f);
-                _spriteBatch.DrawString(_font, "You lost all your boxes.", center - _font.MeasureString("You lose all your boxes."), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-                _spriteBatch.DrawString(_font, "Press Enter to restart.", center - _font.MeasureString("Press Enter to restart.") + new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-                _spriteBatch.DrawString(_font, string.Format("Final Score: {0}", (int)_score), center - _font.MeasureString(string.Format("Final Score: {0}", (int)_score)) + new Vector2(0, 80), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-            }
-
             if (_instructionScreen)
             {
                 var bounds = GraphicsDevice.Viewport.Bounds;
@@ -465,7 +450,31 @@ namespace Boxes
                 _spriteBatch.DrawString(_font, "Boxes that don't make it disappear.", center - _font.MeasureString("Boxes that don't make it disappear.") + new Vector2(0, 80), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
                 _spriteBatch.DrawString(_font, "Don't lose all your boxes!", center - _font.MeasureString("Don't lose all your boxes!") + new Vector2(0, 120), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
                 _spriteBatch.DrawString(_font, "Press Enter to start.", center - _font.MeasureString("Press Enter to start.") + new Vector2(0, 160), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.End();
+                return;
             }
+            if (_paused)
+            {
+                var bounds = GraphicsDevice.Viewport.Bounds;
+                var center = new Vector2(bounds.Center.X, bounds.Center.Y);
+                _spriteBatch.DrawString(_font, "Paused.", center - _font.MeasureString("Paused."), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Press Enter to unpause.", center - _font.MeasureString("Press Enter to unpause.") - new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.End();
+                return;
+            }
+
+            if (_gameLost)
+            {
+                var bounds = GraphicsDevice.Viewport.Bounds;
+                var center = new Vector2(bounds.Center.X, bounds.Center.Y);
+                _spriteBatch.DrawString(_font, "Game over!", center-_font.MeasureString("Game over!")-new Vector2(0,40),Color.White,0f,Vector2.Zero,2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "You lost all your boxes.", center - _font.MeasureString("You lose all your boxes."), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, "Press Enter to restart.", center - _font.MeasureString("Press Enter to restart.") + new Vector2(0, 40), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(_font, string.Format("Final Score: {0}", (int)_score), center - _font.MeasureString(string.Format("Final Score: {0}", (int)_score)) + new Vector2(0, 80), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                _spriteBatch.End();
+                return;
+            }
+
 
             _spriteBatch.End();
 

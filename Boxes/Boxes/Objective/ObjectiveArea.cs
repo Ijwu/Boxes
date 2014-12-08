@@ -63,7 +63,7 @@ namespace Boxes.Objective
             _innerColor = Color.GhostWhite;
             _innerColor *= .4f;
             _startTime = DateTime.Now;
-            _timer.Interval = Math.Max(TimeToLive, 750);
+            _timer.Interval = Math.Max(TimeToLive, 400);
             _timer.AutoReset = true;
             _timer.Start();
         }
@@ -90,6 +90,16 @@ namespace Boxes.Objective
             _innerRect.Height = newHeight;
             _innerRect.X = mainRect.X + widthReduction/2;
             _innerRect.Y = mainRect.Y + heightReduction/2;
+        }
+
+        public void Pause()
+        {
+            _timer.Stop();
+        }
+
+        public void Resume()
+        {
+            _timer.Start();
         }
 
         public Rectangle GetBoundingBox()

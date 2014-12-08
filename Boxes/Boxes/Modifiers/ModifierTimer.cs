@@ -45,7 +45,7 @@ namespace Boxes.Modifiers
         {
             _min = time;
             _max = time;
-
+            _timer.AutoReset = true;
             _timer.Elapsed += OnTimerElapsed;
         }
 
@@ -53,7 +53,7 @@ namespace Boxes.Modifiers
         {
             _min = min;
             _max = max;
-
+            _timer.AutoReset = true;
             _timer.Elapsed += OnTimerElapsed;
         }
 
@@ -116,7 +116,6 @@ namespace Boxes.Modifiers
         
         public void Run()
         {
-            _timer.AutoReset = true;
             _timer.Start();
         }
 
@@ -136,6 +135,11 @@ namespace Boxes.Modifiers
         {
             _min = time;
             _max = time;
+        }
+
+        public void Pause()
+        {
+            _timer.Stop();
         }
 
         public Vector2 GetTimeRange()
